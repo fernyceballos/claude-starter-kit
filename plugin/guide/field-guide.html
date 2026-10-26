@@ -1,0 +1,449 @@
+<title>Starter Kit Field Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a transit-map field guide. One job is a route of stations; every phrase is a
+   copyable "ticket"; kits are colored lines (everyone = blue, operator = teal,
+   researcher = violet, builder = orange). Single centered column, cards only for tickets. */
+:root {
+  --paper: #f5f7fb;
+  --panel: #ffffff;
+  --ink: #18202e;
+  --ink-soft: #4a5468;
+  --rule: #d9deea;
+  --line-all: #2f5bea;
+  --line-op: #0b8a87;
+  --line-re: #6b4fd8;
+  --line-bu: #d65a1f;
+  --ticket: #eef2ff;
+  --ticket-ink: #1d3fb8;
+  --focus: #f0b400;
+  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Verdana", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #10141c; --panel: #171d28; --ink: #e7eaf2; --ink-soft: #a3acbf; --rule: #2a3242;
+    --line-all: #7d9bff; --line-op: #3cc9c3; --line-re: #a993ff; --line-bu: #ff8d55;
+    --ticket: #1d2742; --ticket-ink: #b8c8ff; --focus: #ffd34d; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #10141c; --panel: #171d28; --ink: #e7eaf2; --ink-soft: #a3acbf; --rule: #2a3242;
+  --line-all: #7d9bff; --line-op: #3cc9c3; --line-re: #a993ff; --line-bu: #ff8d55;
+  --ticket: #1d2742; --ticket-ink: #b8c8ff; --focus: #ffd34d; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink);
+  font: 400 1.0625rem/1.6 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 4rem;
+}
+.wrap { max-width: 980px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h2 { font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2rem); font-weight: 800; }
+h3 { font-size: 1.15rem; font-weight: 600; }
+p { margin: 0; max-width: 65ch; }
+a { color: var(--line-all); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+
+/* Header */
+.top { padding-block: 2.5rem 1.5rem; display: grid; gap: 1rem; border-bottom: 1px solid var(--rule); }
+.eyebrow { font: 500 0.75rem/1 var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+h1 { font-size: clamp(2.2rem, 1.4rem + 3.6vw, 3.6rem); font-weight: 800; letter-spacing: -0.02em; }
+.lede { font-size: 1.15rem; color: var(--ink-soft); }
+.legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; font-size: 0.9rem; color: var(--ink-soft); }
+.legend span { display: inline-flex; align-items: center; gap: 0.45rem; }
+.dot { width: 0.8rem; height: 0.8rem; border-radius: 50%; display: inline-block; flex: none; }
+.d-all { background: var(--line-all); } .d-op { background: var(--line-op); }
+.d-re { background: var(--line-re); } .d-bu { background: var(--line-bu); }
+
+/* Find bar */
+.find { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper);
+  padding-block: 0.75rem; border-bottom: 1px solid var(--rule); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+.find label { display: flex; align-items: center; gap: 0.6rem; background: var(--panel);
+  border: 1px solid var(--rule); border-radius: 999px; padding: 0.35rem 0.5rem 0.35rem 1rem; }
+.find input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink);
+  font: inherit; padding: 0.35rem 0; }
+.find input:focus { outline: none; }
+.find label:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
+.find .count { font: 500 0.8rem var(--f-mono); color: var(--ink-soft); white-space: nowrap; padding-right: 0.5rem; }
+
+section { padding-block: 2.75rem 0; display: grid; gap: 1.25rem; }
+.sub { color: var(--ink-soft); }
+
+/* Tickets: the phrase you say */
+.say { display: inline-flex; align-items: center; gap: 0.5rem; font: 500 0.95rem/1.2 var(--f-mono);
+  background: var(--ticket); color: var(--ticket-ink); border: 1px dashed currentColor;
+  border-radius: 6px; padding: 0.4rem 0.6rem; cursor: pointer; text-align: left; }
+.say::after { content: "copy"; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.7; }
+.say.copied::after { content: "copied"; opacity: 1; }
+.say:hover { border-style: solid; }
+
+/* Daily five */
+.five { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; padding: 1.1rem 1.15rem 1.2rem;
+  display: grid; gap: 0.65rem; align-content: start; min-width: 0; }
+.card .when { font-size: 0.95rem; color: var(--ink-soft); }
+.card .what { font-size: 0.98rem; }
+
+/* Route map */
+.route { position: relative; display: grid; gap: 0; padding-left: 2.25rem; }
+.route::before { content: ""; position: absolute; left: 0.7rem; top: 0.6rem; bottom: 0.6rem; width: 6px;
+  border-radius: 3px; background: var(--line-all); }
+.stop { position: relative; padding-block: 0 1.4rem; display: grid; gap: 0.35rem; min-width: 0; }
+.stop::before { content: ""; position: absolute; left: -1.95rem; top: 0.25rem; width: 1.1rem; height: 1.1rem;
+  border-radius: 50%; background: var(--paper); border: 4px solid var(--line-all); }
+.stop.any::before { border-style: dotted; }
+.stop .tag { font: 500 0.72rem var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+.fork { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-top: 0.25rem; }
+.fork .card { border-left-width: 6px; }
+.fork .done { border-left-color: var(--line-op); }
+.fork .full { border-left-color: var(--line-bu); }
+
+/* Situation table */
+.table-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; background: var(--panel); }
+table { width: 100%; border-collapse: collapse; min-width: 520px; }
+th, td { text-align: left; padding: 0.8rem 1rem; vertical-align: top; border-top: 1px solid var(--rule); }
+thead th { border-top: 0; font: 600 0.8rem var(--f-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
+td:first-child { width: 45%; }
+
+/* Lines (all phrases by kit) */
+.lines { display: grid; gap: 1.75rem; }
+.line { display: grid; gap: 0.75rem; }
+.line-head { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.line-head .bar { width: 2.5rem; height: 6px; border-radius: 3px; flex: none; }
+.line-head .note { color: var(--ink-soft); font-size: 0.95rem; }
+.rows { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.row { display: grid; grid-template-columns: minmax(0, 18rem) minmax(0, 1fr); gap: 0.5rem 1.25rem;
+  padding-block: 0.8rem; border-bottom: 1px solid var(--rule); align-items: start; }
+.row .say { justify-self: start; max-width: 100%; white-space: normal; }
+.row p { font-size: 0.98rem; }
+.row .also { color: var(--ink-soft); font-size: 0.9rem; display: block; margin-top: 0.2rem; }
+
+/* Automatic helpers */
+.auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem 1.5rem; }
+.auto div { display: grid; gap: 0.2rem; padding-block: 0.6rem; border-top: 2px solid var(--rule); min-width: 0; }
+.auto b { font-family: var(--f-display); font-weight: 600; }
+.auto span { color: var(--ink-soft); font-size: 0.95rem; }
+
+/* App map */
+.app { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+.window { border: 2px solid var(--ink); border-radius: 12px; background: var(--panel); overflow: hidden;
+  display: grid; grid-template-columns: 26% 1fr 24%; grid-template-rows: 1.6rem 11rem 2.6rem; font: 500 0.72rem var(--f-mono); }
+.window .bar { grid-column: 1 / -1; border-bottom: 1px solid var(--rule); display: flex; gap: 0.3rem; align-items: center; padding-left: 0.5rem; }
+.window .bar i { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--rule); }
+.pane { position: relative; border-right: 1px solid var(--rule); padding: 0.5rem; color: var(--ink-soft); }
+.pane.chat { grid-row: 2 / 4; }
+.pane.side { grid-row: 2 / 4; border-right: 0; border-left: 1px solid var(--rule); }
+.pane.left { grid-row: 2 / 4; }
+.compose { position: absolute; left: 0.5rem; right: 0.5rem; bottom: 0.5rem; height: 1.7rem; border: 1px solid var(--rule); border-radius: 6px; }
+.pin { position: absolute; width: 1.35rem; height: 1.35rem; border-radius: 50%; background: var(--line-all); color: var(--paper);
+  display: grid; place-items: center; font: 700 0.75rem var(--f-body); }
+.keys { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; counter-reset: k; }
+.keys li { display: grid; grid-template-columns: 1.6rem 1fr; gap: 0.6rem; align-items: start; }
+.keys li::before { counter-increment: k; content: counter(k); width: 1.35rem; height: 1.35rem; border-radius: 50%;
+  background: var(--line-all); color: var(--paper); display: grid; place-items: center; font: 700 0.75rem var(--f-body); margin-top: 0.15rem; }
+.keys .term { display: block; color: var(--ink-soft); font-size: 0.88rem; }
+
+/* Lessons */
+.lessons { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.75rem; counter-reset: l; list-style: none; padding: 0; margin: 0; }
+.lessons li { counter-increment: l; display: grid; gap: 0.15rem; padding: 0.7rem 0 0; border-top: 2px solid var(--line-all); }
+.lessons li::before { content: "Lesson " counter(l); font: 500 0.72rem var(--f-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
+.lessons b { font-family: var(--f-display); font-weight: 600; }
+.lessons span { color: var(--ink-soft); font-size: 0.92rem; }
+
+.help { margin-top: 3rem; padding: 1.25rem 1.4rem; border-radius: 12px; border: 2px solid var(--line-all); display: grid; gap: 0.5rem; }
+.help .addr { font-family: var(--f-mono); user-select: all; }
+.foot { margin-top: 1.5rem; color: var(--ink-soft); font-size: 0.88rem; }
+
+.hide { display: none !important; }
+.empty { color: var(--ink-soft); font-style: italic; }
+
+@media (max-width: 640px) {
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .app { grid-template-columns: minmax(0, 1fr); }
+  td:first-child { width: auto; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .say { transition: background-color 0.15s ease; }
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Ferny's Claude Code starter kit · field guide</span>
+    <h1>Say the phrase. Claude does the rest.</h1>
+    <p class="lede">Everything you can say to Claude in a starter-kit folder, when to say it, and where things are in the app. Click any phrase to copy it, then paste it into a chat. A phrase only works when your message <strong>starts</strong> with it.</p>
+    <div class="legend" aria-label="Which kind of folder each phrase is for">
+      <span><i class="dot d-all"></i>Every folder</span>
+      <span><i class="dot d-op"></i>Operator: works in your tools</span>
+      <span><i class="dot d-re"></i>Researcher: studies what works</span>
+      <span><i class="dot d-bu"></i>Builder: builds with code</span>
+    </div>
+  </header>
+
+  <div class="find">
+    <label for="q">
+      <span aria-hidden="true">⌕</span>
+      <input id="q" type="search" placeholder="Find a phrase: “full”, “video”, “live”…" autocomplete="off">
+      <span class="count" id="count"></span>
+    </label>
+  </div>
+
+  <section id="daily" aria-labelledby="h-daily">
+    <h2 id="h-daily">The five you'll use every day</h2>
+    <div class="five">
+      <article class="card" data-find="wind down finished done end job wrap up close">
+        <button class="say" type="button">wind down</button>
+        <p class="when">When a job is finished.</p>
+        <p class="what">Claude writes down what got done, what's still open, and what it learned, then tidies up. The next chat starts from those notes.</p>
+      </article>
+      <article class="card" data-find="continue in new session full context 60% hand off half done">
+        <button class="say" type="button">continue in new session</button>
+        <p class="when">When the chat is about 60% full and the job isn't done.</p>
+        <p class="what">Claude saves everything and gives you a short message to paste into a new chat, which picks up exactly where this one stopped.</p>
+      </article>
+      <article class="card" data-find="bumper sticker short simple too long techy plain english">
+        <button class="say" type="button">bumper sticker</button>
+        <p class="when">When an answer is too long or too techy.</p>
+        <p class="what">Claude says it again in short, plain bullets. Same facts, fewer words.</p>
+      </article>
+      <article class="card" data-find="just start skip questions">
+        <button class="say" type="button">just start</button>
+        <p class="when">When you'd rather skip Claude's questions.</p>
+        <p class="what">Claude makes sensible choices, does the work, and lists what it picked so you can change anything.</p>
+      </article>
+      <article class="card" data-find="coach me lessons learn how walkthrough continue the coach">
+        <button class="say" type="button">coach me</button>
+        <p class="when">When you want to learn, or forgot how something works.</p>
+        <p class="what">A short walkthrough, one lesson at a time. Say <em>continue the coach</em> to pick up where you left off.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="route" aria-labelledby="h-route">
+    <h2 id="h-route">The route of one job</h2>
+    <p class="sub">Every job runs the same line, from a new chat to a clean finish.</p>
+    <div class="route">
+      <div class="stop" data-find="new chat start one chat one job">
+        <span class="tag">Station 1</span>
+        <h3>Open a new chat</h3>
+        <p>One chat, one job. Claude reads this folder's notes first, so it knows where things stand.</p>
+      </div>
+      <div class="stop" data-find="talk it through questions brainstorm i'd like help with">
+        <span class="tag">Station 2</span>
+        <h3>Talk it through</h3>
+        <p>Start with <button class="say" type="button">I'd like help with…</button> and answer Claude's questions in your own words. Ten minutes of talking saves an hour of redoing.</p>
+      </div>
+      <div class="stop" data-find="claude works builds tests">
+        <span class="tag">Station 3</span>
+        <h3>Claude does the work</h3>
+        <p>It builds, checks its own work on the real thing, and tells you plainly what it did and didn't check.</p>
+      </div>
+      <div class="stop any" data-find="approval yes no live send publish delete money allow this command">
+        <span class="tag">Any time</span>
+        <h3>You say yes before anything goes live</h3>
+        <p>Claude always asks before it sends to real people, publishes, deletes or spends money. A yes covers that one action only.</p>
+      </div>
+      <div class="stop" data-find="end finished full">
+        <span class="tag">Station 4</span>
+        <h3>The end of the line: pick one</h3>
+        <div class="fork">
+          <div class="card done">
+            <h3>The job is done</h3>
+            <button class="say" type="button">wind down</button>
+            <p class="when">Then open a new chat for the next job.</p>
+          </div>
+          <div class="card full">
+            <h3>The chat is filling up, the job isn't done</h3>
+            <button class="say" type="button">continue in new session</button>
+            <p class="when">Then paste Claude's message into a new chat.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="which" aria-labelledby="h-which">
+    <h2 id="h-which">Which phrase now?</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">When this happens</th><th scope="col">Do this</th></tr></thead>
+        <tbody>
+          <tr data-find="new job start something new"><td>You're starting something new</td><td>Open a new chat and say <button class="say" type="button">I'd like help with…</button></td></tr>
+          <tr data-find="too long techy confusing"><td>An answer is too long or confusing</td><td><button class="say" type="button">bumper sticker</button></td></tr>
+          <tr data-find="finished done"><td>The job is finished</td><td><button class="say" type="button">wind down</button></td></tr>
+          <tr data-find="context 60% full squeezed"><td>Context reaches about 60%, or Claude says the chat "got squeezed"</td><td><button class="say" type="button">continue in new session</button></td></tr>
+          <tr data-find="allow this command box permission"><td>A box asks "allow this command?"</td><td>Reading or listing files: yes is usually safe. Not sure? Say no and ask Claude to explain it.</td></tr>
+          <tr data-find="forgot how"><td>You forgot how something works</td><td><button class="say" type="button">coach me</button> or <button class="say" type="button">show me the guide</button></td></tr>
+          <tr data-find="different kind of work new folder"><td>You want a different kind of work</td><td>Make a new folder, open it, and say <button class="say" type="button">start a project</button></td></tr>
+          <tr data-find="more grow this folder"><td>You want this folder to do more</td><td><button class="say" type="button">upgrade this project</button></td></tr>
+          <tr data-find="stuck help coach"><td>You're stuck</td><td>Ask your coach (address at the bottom of this page).</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="all" aria-labelledby="h-all">
+    <h2 id="h-all">Every phrase, by line</h2>
+    <p class="sub">Your folder's kit decides which lines run there. A folder can have more than one.</p>
+    <div class="lines">
+
+      <div class="line">
+        <div class="line-head"><i class="bar d-all"></i><h3>Every folder</h3></div>
+        <div class="rows">
+          <div class="row" data-find="wind down wrap up close out end the session finished"><button class="say" type="button">wind down</button><p>Close out a finished job: notes first, then tidy up.<span class="also">Also: "wrap up" on its own, "close out the session".</span></p></div>
+          <div class="row" data-find="continue in new session hand this off full"><button class="say" type="button">continue in new session</button><p>Hand an unfinished job to a fresh chat with nothing lost.<span class="also">Also: "hand this off".</span></p></div>
+          <div class="row" data-find="bumper sticker plain english short"><button class="say" type="button">bumper sticker</button><p>The last answer again, short and simple.<span class="also">Also: "in plain English, bulleted".</span></p></div>
+          <div class="row" data-find="just start skip"><button class="say" type="button">just start</button><p>Skip the questions; Claude picks sensible defaults and tells you what it chose.</p></div>
+          <div class="row" data-find="coach me continue the coach lessons"><button class="say" type="button">coach me</button><p>The walkthrough of how to work with Claude, one lesson at a time.<span class="also">Also: "continue the coach".</span></p></div>
+          <div class="row" data-find="show me the guide field guide cheat sheet commands"><button class="say" type="button">show me the guide</button><p>Opens this page. It's yours to keep, and you can pin it in the Claude sidebar.<span class="also">Also: "cheat sheet", "what can I say?"</span></p></div>
+          <div class="row" data-find="start a project new folder set up this folder"><button class="say" type="button">start a project</button><p>Set up a new folder for a kind of work.<span class="also">Also: "set up this folder".</span></p></div>
+          <div class="row" data-find="upgrade this project add kit builder research"><button class="say" type="button">upgrade this project</button><p>Add another kit to this folder.<span class="also">Also: "make this a builder project".</span></p></div>
+          <div class="row" data-find="update the kit newest version"><button class="say" type="button">update the kit</button><p>Get the newest version of the starter kit. The desktop app has no auto-update, so say this now and then.</p></div>
+          <div class="row" data-find="log this session log record"><button class="say" type="button">log this</button><p>Write what just happened into this folder's session log.</p></div>
+          <div class="row" data-find="backlog digest review the backlog shelf to do"><button class="say" type="button">backlog digest</button><p>Go through shelved ideas one call at a time: build soon, sleep until a date, or kill it.<span class="also">Also: "review the backlog", "what's on the shelf".</span></p></div>
+          <div class="row" data-find="set me up first time setup"><button class="say" type="button">set me up</button><p>The first-time setup. You've done this already; saying it again offers to start or upgrade a project.</p></div>
+        </div>
+      </div>
+
+      <div class="line">
+        <div class="line-head"><i class="bar d-op"></i><h3>Operator</h3><span class="note">Claude works inside your tools, in your own Chrome.</span></div>
+        <div class="rows">
+          <div class="row" data-find="operator crm email slack website builder tool do this"><button class="say" type="button">In my CRM, …</button><p>Name the tool and what to do. Claude drafts first and shows you the exact text before anything reaches real people.</p></div>
+          <div class="row" data-find="publish it turn it on yes live"><button class="say" type="button">publish it</button><p>Your yes for that one action. "Turn it on" works the same. It never carries over to the next action or chat.</p></div>
+        </div>
+      </div>
+
+      <div class="line">
+        <div class="line-head"><i class="bar d-re"></i><h3>Researcher</h3><span class="note">Claude studies people, content and markets.</span></div>
+        <div class="rows">
+          <div class="row" data-find="study this profile instagram social strategy research"><button class="say" type="button">study this profile: …</button><p>Paste a profile link. Claude pulls posts and numbers, watches the videos, and writes up what works.<span class="also">Also: "break down their strategy", "audit their reels".</span></p></div>
+          <div class="row" data-find="watch this video loom youtube tiktok reel webinar"><button class="say" type="button">watch this video: …</button><p>Paste a link or a file. Claude reports what's said and what's shown.</p></div>
+        </div>
+      </div>
+
+      <div class="line">
+        <div class="line-head"><i class="bar d-bu"></i><h3>Builder</h3><span class="note">Claude builds apps, portals and sites with code.</span></div>
+        <div class="rows">
+          <div class="row" data-find="autopilot dev hands off build test"><button class="say" type="button">autopilot dev</button><p>After a feature is talked through: Claude builds and tests it without more questions, and stops before anything goes live.</p></div>
+          <div class="row" data-find="autopilot prod live production"><button class="say" type="button">autopilot prod</button><p>Same, then puts it live and checks it live. Saying it is your go-live yes for that feature, in that chat only.</p></div>
+          <div class="row" data-find="make it feel like design look style linear apple notion"><button class="say" type="button">make it feel like Apple</button><p>Pick a look by naming a brand. Claude has about 150 ready-made design styles.</p></div>
+          <div class="row" data-find="add bug reports to my app recipe"><button class="say" type="button">add bug reports to my app</button><p>A ready-made recipe, for once real people use your app.</p></div>
+        </div>
+      </div>
+    </div>
+    <p class="empty hide" id="none">No phrase matches that. Try a shorter word, or just ask Claude in plain words.</p>
+  </section>
+
+  <section id="auto" aria-labelledby="h-auto">
+    <h2 id="h-auto">What Claude does on its own</h2>
+    <p class="sub">No phrase needed. These kick in when they fit.</p>
+    <div class="auto">
+      <div><b>Asks before going live</b><span>Before it sends, publishes, deletes, changes a setting or spends money.</span></div>
+      <div><b>Proves it works</b><span>Opens the real page or app and checks it before saying "done".</span></div>
+      <div><b>Keeps the notes</b><span>The docs folder is this folder's memory: status, decisions, lessons, to-dos.</span></div>
+      <div><b>Works in your browser</b><span>Uses your signed-in Chrome, through the Claude in Chrome extension.</span></div>
+      <div><b>Thinks before building</b><span>Superpowers makes Claude brainstorm first, debug step by step, and show proof.</span></div>
+      <div><b>Warns when the chat got squeezed</b><span>Then it's time to say continue in new session.</span></div>
+    </div>
+  </section>
+
+  <section id="app" aria-labelledby="h-app">
+    <h2 id="h-app">Where things are in the app</h2>
+    <div class="app">
+      <div class="window" style="align-self:start" role="img" aria-label="Sketch of the Claude desktop app with numbered spots matching the list beside it">
+        <div class="bar"><i></i><i></i><i></i></div>
+        <div class="pane left">Sidebar<span class="pin" style="top:0.4rem; right:0.4rem">1</span></div>
+        <div class="pane chat">Chat<div class="compose"><span class="pin" style="left:-0.4rem; top:-0.85rem">2</span><span class="pin" style="right:-0.4rem; top:-0.85rem">3</span></div></div>
+        <div class="pane side">Session panel<span class="pin" style="top:1.7rem; right:0.4rem">4</span></div>
+      </div>
+      <div style="display:grid; gap:1rem; min-width:0">
+      <ol class="keys">
+        <li><span><b>+ New</b>, top left: a new chat. Pick your project folder.</span></li>
+        <li><span><b>+</b> next to the message box: add files or photos, and your plugins.</span></li>
+        <li><span><b>Model and effort</b>, under the message box: switch between Opus and Sonnet.</span></li>
+        <li><span><b>Context %</b> in the right-side panel: how full this chat is. At 60%, say continue in new session.<span class="term">In the Terminal, it's the "chat N% full" line at the bottom instead.</span></span></li>
+      </ol>
+      <p class="sub"><b>Settings → Plugins</b> holds your installed add-ons. Click Starter kit to see its version, and the Update button when a newer one is ready.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="lessons" aria-labelledby="h-lessons">
+    <h2 id="h-lessons">The coach's eight lessons</h2>
+    <p class="sub">Say <button class="say" type="button">coach me</button> to go through them, one at a time.</p>
+    <ol class="lessons">
+      <li><b>One chat = one job</b><span>Fresh chat for each job.</span></li>
+      <li><b>Talk it through first</b><span>Answer questions in your own words.</span></li>
+      <li><b>Bumper sticker</b><span>Ask for the short version.</span></li>
+      <li><b>Wind down</b><span>Finish every job with it.</span></li>
+      <li><b>Continue in new session</b><span>At 60%, hand off cleanly.</span></li>
+      <li><b>Approval gates</b><span>Nothing goes live without your yes.</span></li>
+      <li><b>Worktrees</b><span>Each builder chat gets its own copy.</span></li>
+      <li><b>Growing</b><span>New folders for new kinds of work.</span></li>
+    </ol>
+  </section>
+
+  <div class="help">
+    <h3>Stuck?</h3>
+    <p>Tell Claude what you see, in your own words. If you still can't get it working, contact your coach:</p>
+    <p class="addr">ferny@attractionmarketing.com</p>
+  </div>
+  <p class="foot">Starter kit field guide · kit 0.1.5. Say <strong>update the kit</strong>, then <strong>show me the guide</strong>, for the newest version.</p>
+</div>
+
+<script>
+(function () {
+  function copyText(btn) {
+    var text = btn.textContent.replace(/…$/, "").trim();
+    var done = function () {
+      btn.classList.add("copied");
+      setTimeout(function () { btn.classList.remove("copied"); }, 1400);
+    };
+    var fallback = function () {
+      var r = document.createRange(); r.selectNodeContents(btn);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else { fallback(); }
+    } catch (e) { fallback(); }
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest(".say");
+    if (b) copyText(b);
+  });
+
+  var q = document.getElementById("q");
+  var count = document.getElementById("count");
+  var none = document.getElementById("none");
+  var items = Array.prototype.slice.call(document.querySelectorAll("[data-find]"));
+  function filter() {
+    var v = q.value.trim().toLowerCase();
+    var shown = 0;
+    items.forEach(function (el) {
+      var hay = (el.getAttribute("data-find") + " " + el.textContent).toLowerCase();
+      var hit = !v || hay.indexOf(v) !== -1;
+      el.classList.toggle("hide", !hit);
+      if (hit) shown++;
+    });
+    document.querySelectorAll(".line").forEach(function (line) {
+      var any = line.querySelector(".row:not(.hide)");
+      line.classList.toggle("hide", !!v && !any);
+    });
+    count.textContent = v ? shown + " found" : "";
+    none.classList.toggle("hide", !v || !!document.querySelector(".row:not(.hide)"));
+  }
+  q.addEventListener("input", filter);
+})();
+</script>

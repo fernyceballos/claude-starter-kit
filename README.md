@@ -27,7 +27,8 @@ Your setup takes about 20–30 minutes, most of it waiting for installs.
 - **Grow this folder?** Say **upgrade this project**.
 - **Get the newest version:** say **update the kit**. (In the terminal you can also turn on
   auto-update, and setup shows you how. The desktop app updates by hand only.)
-- **Forgot how something works?** Say **coach me**.
+- **Forgot how something works?** Say **coach me**, or **show me the guide** for the field guide:
+  every phrase, when to say it, and where things are in the app, on one page you keep.
 - **Stuck?** Contact ferny@attractionmarketing.com.
 
 ## What's inside (for the curious)

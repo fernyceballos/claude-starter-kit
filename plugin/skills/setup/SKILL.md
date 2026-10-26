@@ -174,7 +174,8 @@ Three short lists, **Done**, **Kept** and **Needs you**, plus:
 New skills only load in a new chat, so this chat can't run the coach. Say:
 - "**Open a new chat in <PROJECT>.**" (Desktop app: start a new session and pick that folder.)
 - "In the new chat, say **coach me** for the 10-minute walkthrough of how to work with Claude. I'd
-  start there." (The new chat will also offer it once on its own.)
+  start there. The coach also gives you your field guide: every phrase on one page, to keep."
+  (The new chat will also offer the coach once on its own.)
 
 ---
 
