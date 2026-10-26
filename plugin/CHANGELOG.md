@@ -1,5 +1,12 @@
 # What's new in the starter kit
 
+## 0.1.5 — 2026-10-26
+
+- **New: your field guide.** One page with every phrase you can say, when to say it, the route of
+  a job from new chat to wind down, and where things are in the app. Click a phrase to copy it.
+  The coach gives it to you as your own private page to keep (you can pin it in your Claude
+  sidebar), and **show me the guide** opens it any time.
+
 ## 0.1.4 — 2026-10-26
 
 - The coach and setup now say where to see how full a chat is in the desktop app: the

@@ -27,6 +27,10 @@ when the person says yes or "coach me".
 1. Run `starter-kit-state coach list` to see the lesson numbers already done.
 2. First time: one line on what this is ("8 short lessons, about 10 minutes, one at a time. Say
    *stop* any time and *continue the coach* later").
+   **The field guide comes with it:** if `starter-kit-state get guide-url` is empty (first time, or
+   they started the coach before the guide existed), follow the `guide` skill
+   (`$ROOT/skills/guide/SKILL.md`) now to publish it, and give the link in one line before the
+   lesson: "Here's your field guide to keep: every phrase, on one page." Then show the lesson.
 3. Show the **next** lesson that applies and isn't done. Show it as written: its heading, What,
    Why, Try it now, in the lesson's own words. Keep it to one screen.
 4. **Video line:** if it starts with `__VIDEO`, say "(video coming soon)". Otherwise give the link.
@@ -35,7 +39,9 @@ when the person says yes or "coach me".
    leading zero: lesson `04-…` is `4`), then go to the next lesson.
 7. When every applicable lesson is done, run `starter-kit-state set coach-done yes`. Close with a
    five-line recap of the phrases (wind down · continue in new session · bumper sticker · start a
-   project · and, for builders, autopilot dev), and "Start a new chat for your first real job."
+   project · and, for builders, autopilot dev), a line pointing to the field guide ("all of
+   these and more are in your field guide; say **show me the guide** to open it"), and "Start a
+   new chat for your first real job."
 
 One lesson per message. Never paste several at once.
 

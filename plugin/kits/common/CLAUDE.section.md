@@ -67,6 +67,7 @@ The person can start a message with any of these:
   and test it without more questions (dev stops before anything goes live; prod goes live).
 - **"bumper sticker"** — say the last answer again, short and simple.
 - **"coach me"** — the walkthrough of how to work with Claude.
+- **"show me the guide"** — the field guide: every phrase on one page they keep (the `guide` skill).
 - **"start a project"** / **"upgrade this project"** — set up or grow a folder.
 
 A phrase only counts when the message **starts** with it. Talking *about* a phrase isn't a command.
