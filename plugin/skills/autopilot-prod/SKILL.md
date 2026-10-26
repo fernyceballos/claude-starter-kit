@@ -7,7 +7,7 @@ description: Use when the person's message STARTS with "autopilot prod" (also "a
 
 **REQUIRED:** read the shared procedure in full before Phase 0:
 `../autopilot-dev/references/autopilot-core.md`, relative to this file. (Or run `starter-kit-root`;
-if it isn't found, use `jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath' ~/.claude/plugins/installed_plugins.json`, and open
+if it isn't found, use `{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions -path '*/rpm/plugin_*/.claude-plugin/plugin.json' -exec grep -l '"name": *"starter-kit"' {} + | sed 's|/.claude-plugin/plugin.json$||'; } 2>/dev/null | head -1`, and open
 `skills/autopilot-dev/references/autopilot-core.md` under that folder.)
 
 ## Run the shared procedure through Phase 5

@@ -1,5 +1,14 @@
 # What's new in the starter kit
 
+## 0.1.1 — 2026-10-26
+
+- Setup now works in the Claude desktop app. The app keeps the plugins it installs in its own
+  folder, so setup couldn't confirm Superpowers or find the kit after you'd installed them there.
+  It now looks in both places.
+- The desktop app steps are fixed: Superpowers is added straight from the app's Plugins screen
+  (search "superpowers"), and the starter kit's marketplace is added with **+ Add → Add
+  marketplace** on that screen.
+
 ## 0.1.0 — 2026-10-26
 
 - First version: setup with three starter kits (operator, researcher, builder), the coach
