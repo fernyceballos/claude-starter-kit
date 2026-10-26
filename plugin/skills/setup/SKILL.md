@@ -82,6 +82,10 @@ nothing is deleted. Say that.
    - **operator**: "do things for me inside tools I use" (a CRM, Slack, email, a website builder).
    - **researcher**: "study a person, profile, videos or a market and tell me what works".
    - **builder**: "build an app, portal or website with code".
+   - **all three** ("all of the above"): a bit of everything. Always offer it alongside the three.
+     Apply operator, researcher and builder, in that order. Each adds its own section and files
+     without touching the others, so they sit together in one folder fine. Question 3 and the
+     researcher tools below then apply too.
    - Not sure → recommend **operator**; it's the gentlest start and can be upgraded later.
 3. **(operator only)** "Which tool will I work in first?" Recommend naming just the first one;
    more can be added later. It goes into `docs/MAP.md` after the kit is applied, as a name and
