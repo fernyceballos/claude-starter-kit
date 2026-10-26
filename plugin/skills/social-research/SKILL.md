@@ -10,7 +10,7 @@ description: Use when the person wants to reverse-engineer what someone does on 
 ## Step 0 — the first-time warning (once ever)
 
 Run `starter-kit-state has research-warned` (if that command isn't found, use
-`"$(jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath' ~/.claude/plugins/installed_plugins.json)/bin/starter-kit-state"`). If it isn't set, tell the person this in plain words
+`"$({ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions -path '*/rpm/plugin_*/.claude-plugin/plugin.json' -exec grep -l '"name": *"starter-kit"' {} + | sed 's|/.claude-plugin/plugin.json$||'; } 2>/dev/null | head -1)/bin/starter-kit-state"`). If it isn't set, tell the person this in plain words
 before anything else, then run `starter-kit-state set research-warned yes`:
 
 > This works through your own signed-in Instagram (or other account) in Chrome, the same way you'd
