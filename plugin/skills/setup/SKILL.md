@@ -67,8 +67,8 @@ Run `"$ROOT/bin/starter-kit-legacy-scan"`. For each finding, explain it in one l
 - `open_design_b` and `karpathy_skills`: extra skills from an older setup that this kit no longer
   uses. → `starter-kit-retire` them.
 - `plugins` of kind `ecc` or `karpathy`: a large add-on whose automatic triggers would talk over
-  this kit's. → `claude plugin disable <id>` (or the desktop app's + → Plugins → Manage plugins if
-  the `claude` command isn't found).
+  this kit's. → `claude plugin disable <id>` (or, if the `claude` command isn't found, the desktop
+  app's Settings → Plugins → Yours → **…** on that plugin's row → **Turn off**).
 
 Retiring moves folders to `~/.claude/skills-retired-<date>/`, and disabling can be undone, so
 nothing is deleted. Say that.
@@ -132,10 +132,14 @@ them to say *continue in new session*.
 
 ### 8. Updates
 
-Turn on automatic updates for the kit: in the desktop app, **+ → Plugins → Manage plugins →
-Marketplaces → starter-kit-marketplace → Enable auto-update**. In the terminal it's `/plugin` →
-Marketplaces. Walk them through it and wait. Also mention that saying **"update the kit"** updates
-by hand any time.
+**In the terminal** (`claude` works): turn on automatic updates for the kit with `/plugin` →
+Marketplaces → starter-kit-marketplace → enable auto-update. Walk them through it and wait.
+
+**In the desktop app** there is no auto-update switch, so don't send them looking for one. Tell
+them updates are by hand, and how: say **"update the kit"** in any chat, or click through the
+Update steps below themselves. Nothing to click now.
+
+Either way, mention that saying **"update the kit"** updates by hand any time.
 
 ### 9. Set up the project folder
 
@@ -200,7 +204,11 @@ real job."
    chat to use it. Their folders and settings aren't changed by an update; "upgrade this project"
    picks up new kit pieces if they want them.
 5. If `claude` isn't found (the desktop app doesn't always add the command), walk them through
-   + → Plugins → Manage plugins → starter-kit → Update instead.
+   the desktop app instead, then carry on from step 4:
+   1. Settings → Plugins → **Manage marketplaces** → **…** on starter-kit-marketplace →
+      **Check for updates** → Done.
+   2. Plugins → Yours → click the **Starter kit** row. Its page shows the version, and an
+      **Update** button when a newer one is ready. Click it.
 6. If it fails with a sign-in or "repository not found" error: `gh auth status`, then
    `gh auth setup-git`, and retry. Still failing → their access may have ended; point them to
    their coach (the contact in `~/.claude/CLAUDE.md`).
