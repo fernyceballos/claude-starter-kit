@@ -42,9 +42,10 @@ coach at ferny@attractionmarketing.com.
 Note for steps 4 and 5: if `claude --version` doesn't work (the desktop app doesn't always add
 the `claude` command), use the desktop app's Plugins screen instead and walk me through the
 clicks. Open it with + (next to the message box) → Add plugins (once something is installed, it's
-+ → Plugins → Browse plugins). The desktop app keeps the plugins it installs in its own folder,
-not in ~/.claude/plugins, so use the check commands below rather than reading
-~/.claude/plugins/installed_plugins.json.
++ → Plugins → Browse plugins). Where the desktop app puts a plugin depends on where it came
+from: Anthropic's own plugin list (Superpowers) goes into the app's own folder, not
+~/.claude/plugins; a marketplace you add (the starter kit) goes into ~/.claude/plugins like the
+`claude` command does. So use the check commands below, which look in both places.
 
 4. Install Superpowers (good working habits for Claude):
    - With `claude`:
@@ -62,7 +63,10 @@ not in ~/.claude/plugins, so use the check commands below rather than reading
      `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1 claude plugin marketplace add fernyceballos/claude-starter-kit`
      `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1 claude plugin install starter-kit@starter-kit-marketplace --scope user`
    - In the desktop app: on the Plugins screen click **+ Add** (top right) → **Add marketplace**,
-     paste `fernyceballos/claude-starter-kit`, confirm, then install **starter-kit** from it.
+     paste `fernyceballos/claude-starter-kit`, confirm. **Starter kit** then shows on the Discover
+     tab: click the arrow next to its **Add** button and choose **Install for me** (installs to
+     ~/.claude/, for all projects). Not either "Install for project" option: those put it in just
+     this one folder.
    If either one fails with a sign-in or "not found" error, run `gh auth setup-git` again and
    retry once.
 
