@@ -1,0 +1,173 @@
+#!/bin/bash
+# starter-kit-apply <operator|researcher|builder> <folder>
+# Sets up a folder with one starter kit without overwriting anything. Prints one line per item:
+#   filled docs/X | kept docs/X | CLAUDE.md <id>: added|kept | settings: <report> |
+#   git: initialized|already a repo | filled|added N|kept .gitignore
+# and finishes with "applied <kit> to <folder>". It never commits and never runs `git add`.
+# Exit 0 ok, 2 bad arguments, an unknown kit, an unsafe folder (/, home, Desktop, Documents,
+# Downloads) or a settings file that is not valid JSON, 1 when a step failed (a docs file that
+# could not be copied, a merge that failed): the final "applied" line is then not printed.
+set -u
+
+PLUGIN="$(cd "$(dirname "$0")/.." && pwd)"
+KITS="$PLUGIN/kits"
+
+usage() { echo "usage: starter-kit-apply <operator|researcher|builder> <folder>" >&2; exit 2; }
+
+[ $# -eq 2 ] || usage
+KIT="$1"; FOLDER="$2"
+[ -n "$KIT" ] && [ -n "$FOLDER" ] || usage
+
+case "$KIT" in
+  operator|researcher|builder) ;;
+  *) echo "unknown kit: $KIT (use operator, researcher or builder)" >&2; exit 2 ;;
+esac
+
+[ -d "$KITS/$KIT" ] && [ -d "$KITS/common" ] || { echo "kit files missing in $KITS" >&2; exit 1; }
+
+# Refuse the places a newcomer's Terminal often starts in: setting one of them up would write a
+# CLAUDE.md that applies to every project below it, and make every later project "already a repo".
+resolve_dir() { # existing folder -> its real path (trailing slash and .. resolved); else as typed
+  if [ -d "$1" ]; then (cd "$1" 2>/dev/null && pwd -P) || printf '%s' "$1"
+  else printf '%s' "${1%/}"; fi
+}
+RESOLVED="$(resolve_dir "$FOLDER")"
+[ -n "$RESOLVED" ] || RESOLVED="/"
+HOME_RAW="${HOME:-}"; HOME_RAW="${HOME_RAW%/}"
+HOME_REAL=""; [ -n "$HOME_RAW" ] && HOME_REAL="$(resolve_dir "$HOME_RAW")"
+unsafe=0
+[ "$RESOLVED" = "/" ] && unsafe=1
+for h in "$HOME_RAW" "$HOME_REAL"; do
+  [ -n "$h" ] || continue
+  for u in "$h" "$h/Desktop" "$h/Documents" "$h/Downloads"; do
+    [ "$RESOLVED" = "$u" ] && unsafe=1
+  done
+done
+if [ "$unsafe" -eq 1 ]; then
+  echo "won't set up $FOLDER: pick or make a project folder, e.g. ~/Projects/<name>" >&2
+  exit 2
+fi
+
+mkdir -p "$FOLDER/docs" || { echo "could not create $FOLDER" >&2; exit 1; }
+
+# Next free backup name for a file: <file>.bak-YYYY-MM-DD, then -2, -3 ...
+backup_name() {
+  local b="$1.bak-$(date +%F)" n=2
+  while [ -e "$b" ]; do b="$1.bak-$(date +%F)-$n"; n=$((n + 1)); done
+  printf '%s' "$b"
+}
+
+# 3. Docs: common first, then the kit's. An existing file is never touched.
+COPY_FAILED=0
+copy_docs() { # <docs source folder>
+  local src="$1" rel
+  [ -d "$src" ] || return 0
+  while IFS= read -r rel; do
+    rel="${rel#./}"
+    if [ -e "$FOLDER/docs/$rel" ]; then
+      echo "kept docs/$rel"
+    else
+      if mkdir -p "$(dirname "$FOLDER/docs/$rel")" && cp "$src/$rel" "$FOLDER/docs/$rel" 2>/dev/null; then
+        echo "filled docs/$rel"
+      else
+        echo "could not copy docs/$rel" >&2
+        COPY_FAILED=1
+      fi
+    fi
+  done < <(cd "$src" && find . -type f | LC_ALL=C sort)
+}
+copy_docs "$KITS/common/docs"
+copy_docs "$KITS/$KIT/docs"
+
+# 4. CLAUDE.md sections: common, then the kit. The merge helper backs the file up each time it
+# changes it; here that would mean a pointless backup of our own half-finished file, so we
+# keep only one backup of what the person had before this run (none if there was no file).
+CM="$FOLDER/CLAUDE.md"
+CM_ORIG=""
+if [ -f "$CM" ]; then
+  CM_ORIG="$(mktemp "${TMPDIR:-/tmp}/starter-kit-claudemd.XXXXXX")" || exit 1
+  cp -p "$CM" "$CM_ORIG" || exit 1
+  trap 'rm -f "$CM_ORIG"' EXIT
+fi
+CM_BAKS_BEFORE="$(ls -d "$CM".bak-* 2>/dev/null | LC_ALL=C sort)"
+for id in common "$KIT"; do
+  res="$(bash "$PLUGIN/bin/starter-kit-claudemd-merge" "$CM" "$KITS/$id/CLAUDE.section.md" "$id")" \
+    || { echo "could not merge the $id section into $CM" >&2; exit 1; }
+  echo "CLAUDE.md $id: $res"
+done
+CM_BAKS_AFTER="$(ls -d "$CM".bak-* 2>/dev/null | LC_ALL=C sort)"
+if [ "$CM_BAKS_BEFORE" != "$CM_BAKS_AFTER" ]; then
+  while IFS= read -r b; do
+    [ -n "$b" ] || continue
+    printf '%s\n' "$CM_BAKS_BEFORE" | grep -qxF -- "$b" || rm -f "$b"
+  done <<EOT
+$CM_BAKS_AFTER
+EOT
+  if [ -n "$CM_ORIG" ]; then cp -p "$CM_ORIG" "$(backup_name "$CM")"; fi
+fi
+[ -z "$CM_ORIG" ] || { rm -f "$CM_ORIG"; trap - EXIT; }
+
+# 5. settings.json
+SETTINGS_EXISTED=0
+[ -e "$FOLDER/.claude/settings.json" ] && SETTINGS_EXISTED=1
+res="$(bash "$PLUGIN/bin/starter-kit-settings-merge" "$FOLDER/.claude/settings.json" "$KITS/$KIT/settings.json")"
+rc=$?
+if [ "$rc" -ne 0 ]; then
+  exit "$rc"   # the helper already said why on stderr (exit 2 = invalid JSON, nothing written)
+fi
+if [ -n "$res" ]; then
+  printf '%s\n' "$res" | while IFS= read -r line; do echo "settings: $line"; done
+elif [ "$SETTINGS_EXISTED" -eq 1 ]; then
+  echo "settings: kept"
+else
+  echo "settings: filled .claude/settings.json"
+fi
+
+# 6. git: initialize only when the folder isn't already inside a repo. Never add or commit.
+if ! command -v git >/dev/null 2>&1; then
+  echo "git: not installed (skipped)"
+elif git -C "$FOLDER" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo "git: already a repo"
+else
+  if ! git -C "$FOLDER" init -q -b main >/dev/null 2>&1; then
+    # Older git without -b: init, then point HEAD at main.
+    git -C "$FOLDER" init -q >/dev/null 2>&1 \
+      && git -C "$FOLDER" symbolic-ref HEAD refs/heads/main >/dev/null 2>&1
+  fi
+  if git -C "$FOLDER" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "git: initialized"
+  else
+    echo "git: could not initialize (skipped)"
+  fi
+fi
+
+# 7. .gitignore: append only the lines that are missing (exact line match).
+GI="$FOLDER/.gitignore"
+MISSING=""
+NMISSING=0
+while IFS= read -r line || [ -n "$line" ]; do
+  [ -n "$line" ] || continue
+  if [ ! -f "$GI" ] || ! grep -qxF -- "$line" "$GI"; then
+    MISSING="$MISSING$line
+"
+    NMISSING=$((NMISSING + 1))
+  fi
+done < "$KITS/common/gitignore"
+
+if [ "$NMISSING" -eq 0 ]; then
+  echo "kept .gitignore"
+elif [ ! -e "$GI" ]; then
+  printf '%s' "$MISSING" > "$GI" && echo "filled .gitignore"
+else
+  cp -p "$GI" "$(backup_name "$GI")" || { echo "could not back up $GI" >&2; exit 1; }
+  # Start on a fresh line if the file doesn't end with one.
+  if [ -s "$GI" ] && [ -n "$(tail -c 1 "$GI")" ]; then printf '\n' >> "$GI"; fi
+  printf '%s' "$MISSING" >> "$GI"
+  if [ "$NMISSING" -eq 1 ]; then echo "added 1 .gitignore line"; else echo "added $NMISSING .gitignore lines"; fi
+fi
+
+if [ "$COPY_FAILED" -ne 0 ]; then
+  echo "some docs could not be copied (see above); the setup is not complete" >&2
+  exit 1
+fi
+echo "applied $KIT to $FOLDER"

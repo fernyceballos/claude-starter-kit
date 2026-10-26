@@ -1,0 +1,80 @@
+#!/bin/bash
+# starter-kit-legacy-scan
+# Looks in $HOME/.claude for leftovers of an earlier, prompt-by-prompt setup and prints ONE
+# compact JSON object on stdout, always with these four keys in this order:
+#   same_name_skills  personal skill folders named like a skill this kit ships (must hold a SKILL.md)
+#   open_design_b     names listed in design-systems/INSTALLED-SKILLS.txt whose folder still exists
+#   karpathy_skills   personal skill folders whose name contains "karpathy" (any case)
+#   plugins           [{"id":..., "kind":"ecc"|"karpathy"}] from plugins/installed_plugins.json
+# A skill can appear in two lists; nothing is de-duplicated across lists. Missing files give [].
+# Read-only. Exit 0, or 2 if jq is not installed.
+set -u
+
+command -v jq >/dev/null 2>&1 || { echo "jq is required" >&2; exit 2; }
+
+PLUGIN="$(cd "$(dirname "$0")/.." && pwd)"
+SKILLS="$HOME/.claude/skills"
+INSTALLED="$SKILLS/design-systems/INSTALLED-SKILLS.txt"
+PLUGINS_FILE="$HOME/.claude/plugins/installed_plugins.json"
+
+# Newline-separated names on stdin -> sorted JSON array of strings.
+to_json() { LC_ALL=C sort | jq -Rn '[inputs | select(length > 0)]' | jq -c .; }
+
+# The kit's own skill names: folders under plugin/skills that hold a SKILL.md.
+kit_names() {
+  local d
+  for d in "$PLUGIN"/skills/*/; do
+    [ -f "${d}SKILL.md" ] && basename "$d"
+  done
+}
+
+same_name() {
+  local n
+  kit_names | while IFS= read -r n; do
+    [ -f "$SKILLS/$n/SKILL.md" ] && printf '%s\n' "$n"
+  done
+}
+
+open_design_b() {
+  [ -f "$INSTALLED" ] || return 0
+  local line
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%$'\r'}"
+    line="${line#"${line%%[![:space:]]*}"}"   # trim leading spaces
+    line="${line%"${line##*[![:space:]]}"}"   # trim trailing spaces
+    case "$line" in ''|'#'*) continue ;; esac
+    case "$line" in */*|.|..) continue ;; esac
+    [ -d "$SKILLS/$line" ] && printf '%s\n' "$line"
+  done < "$INSTALLED"
+}
+
+karpathy() {
+  [ -d "$SKILLS" ] || return 0
+  local d n
+  for d in "$SKILLS"/*/; do
+    [ -d "$d" ] || continue
+    n="$(basename "$d")"
+    case "$(printf '%s' "$n" | tr '[:upper:]' '[:lower:]')" in *karpathy*) printf '%s\n' "$n" ;; esac
+  done
+}
+
+plugins_json() {
+  [ -f "$PLUGINS_FILE" ] || { echo '[]'; return 0; }
+  jq -c '
+    if (type == "object") and ((.plugins | type) == "object") then
+      [ .plugins | keys[]
+        | if (contains("everything-claude-code") or startswith("ecc@")) then {id: ., kind: "ecc"}
+          elif contains("karpathy") then {id: ., kind: "karpathy"}
+          else empty end ]
+    else [] end' "$PLUGINS_FILE" 2>/dev/null || echo '[]'
+}
+
+SAME="$(same_name | to_json)"
+OPEN="$(open_design_b | to_json)"
+KARP="$(karpathy | to_json)"
+PLUG="$(plugins_json)"
+[ -n "$PLUG" ] || PLUG='[]'
+
+jq -nc --argjson s "$SAME" --argjson o "$OPEN" --argjson k "$KARP" --argjson p "$PLUG" \
+  '{same_name_skills: $s, open_design_b: $o, karpathy_skills: $k, plugins: $p}'
+exit 0

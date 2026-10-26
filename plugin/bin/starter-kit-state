@@ -1,0 +1,92 @@
+#!/bin/bash
+# Tiny state store for the starter kit. Each value is a file under
+#   $HOME/.claude/starter-kit/state/
+# (outside the plugin folder, so it survives plugin updates).
+#
+#   starter-kit-state get <key>            print the value (nothing if unset; exit 0)
+#   starter-kit-state set <key> <value>    store a value
+#   starter-kit-state has <key>            exit 0 if the key exists, 1 if not
+#   starter-kit-state coach mark <n>       record lesson n done (no duplicates; 03 is stored as 3;
+#                                          not a whole number: exit 2)
+#   starter-kit-state coach list           print recorded lesson numbers, one per line
+#   starter-kit-state add-line <key> <line>   append a line to a list file (no duplicates)
+#   starter-kit-state has-line <key> <line>   exit 0 if the exact line is in the list file
+#
+# Keys used: coach-done, coach-offered, last-seen-version, research-warned,
+# coach-progress (via "coach"), folders-tipped (a list of folder paths).
+set -u
+
+DIR="${HOME:-}/.claude/starter-kit/state"
+
+die() { printf 'starter-kit-state: %s\n' "$1" >&2; exit 1; }
+
+[ -n "${HOME:-}" ] || die "HOME is not set"
+
+valid_key() { # letters, digits and dashes only, so a key can never be a path
+  case "$1" in
+    ""|*[!a-z0-9-]*) return 1 ;;
+  esac
+  return 0
+}
+
+ensure_dir() { mkdir -p "$DIR" 2>/dev/null || die "cannot create $DIR"; }
+
+cmd="${1:-}"
+case "$cmd" in
+  get)
+    [ $# -eq 2 ] || die "usage: get <key>"
+    valid_key "$2" || die "bad key: $2"
+    [ -f "$DIR/$2" ] && cat "$DIR/$2"
+    exit 0
+    ;;
+  set)
+    [ $# -eq 3 ] || die "usage: set <key> <value>"
+    valid_key "$2" || die "bad key: $2"
+    ensure_dir
+    printf '%s\n' "$3" > "$DIR/$2" || die "cannot write $2"
+    ;;
+  has)
+    [ $# -eq 2 ] || die "usage: has <key>"
+    valid_key "$2" || die "bad key: $2"
+    [ -e "$DIR/$2" ]
+    exit $?
+    ;;
+  coach)
+    case "${2:-}" in
+      mark)
+        [ $# -eq 3 ] || die "usage: coach mark <n>"
+        case "$3" in ""|*[!0-9]*) printf 'starter-kit-state: lesson number must be a whole number\n' >&2; exit 2 ;; esac
+        # one way to store a number: strip leading zeros (03 -> 3, 000 -> 0)
+        n="$3"
+        while [ "${#n}" -gt 1 ] && [ "${n#0}" != "$n" ]; do n="${n#0}"; done
+        ensure_dir
+        if ! grep -qxF -- "$n" "$DIR/coach-progress" 2>/dev/null; then
+          printf '%s\n' "$n" >> "$DIR/coach-progress" || die "cannot write coach-progress"
+        fi
+        ;;
+      list)
+        [ -f "$DIR/coach-progress" ] && cat "$DIR/coach-progress"
+        exit 0
+        ;;
+      *) die "usage: coach mark <n> | coach list" ;;
+    esac
+    ;;
+  add-line)
+    [ $# -eq 3 ] || die "usage: add-line <key> <line>"
+    valid_key "$2" || die "bad key: $2"
+    ensure_dir
+    if ! grep -qxF -- "$3" "$DIR/$2" 2>/dev/null; then
+      printf '%s\n' "$3" >> "$DIR/$2" || die "cannot write $2"
+    fi
+    ;;
+  has-line)
+    [ $# -eq 3 ] || die "usage: has-line <key> <line>"
+    valid_key "$2" || die "bad key: $2"
+    grep -qxF -- "$3" "$DIR/$2" 2>/dev/null && exit 0
+    exit 1
+    ;;
+  *)
+    die "usage: get|set|has|coach|add-line|has-line"
+    ;;
+esac
+exit 0

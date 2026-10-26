@@ -1,0 +1,28 @@
+#!/bin/bash
+# Status line: reads Claude Code's status JSON on stdin, prints one line.
+#   chat 12% full
+#   chat 63% full → say continue in new session     (at 60% and up)
+#   chat —                                          (no number available)
+# Always exits 0, even when jq is missing or the input is not JSON.
+set -u
+
+fallback() { printf 'chat —\n'; exit 0; }
+
+command -v jq >/dev/null 2>&1 || fallback
+
+PCT="$(jq -r '
+  try (
+    .context_window.used_percentage
+    | if type == "number" then (if . < 0 then 0 elif . > 100 then 100 else . end | floor | tostring) else empty end
+  ) catch empty' 2>/dev/null)" || fallback
+
+case "$PCT" in
+  ''|*[!0-9]*) fallback ;;
+esac
+
+if [ "$PCT" -ge 60 ]; then
+  printf 'chat %s%% full → say continue in new session\n' "$PCT"
+else
+  printf 'chat %s%% full\n' "$PCT"
+fi
+exit 0

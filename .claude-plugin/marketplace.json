@@ -1,0 +1,16 @@
+{
+  "name": "starter-kit-marketplace",
+  "owner": {
+    "name": "Ferny"
+  },
+  "metadata": {
+    "description": "Ferny's Claude Code starter kit for the people he coaches"
+  },
+  "plugins": [
+    {
+      "name": "starter-kit",
+      "source": "./plugin",
+      "description": "Ferny's Claude Code starter kit: setup, coaching, and the skills he works with"
+    }
+  ]
+}

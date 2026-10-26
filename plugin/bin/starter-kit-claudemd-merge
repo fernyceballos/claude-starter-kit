@@ -1,0 +1,120 @@
+#!/bin/bash
+# starter-kit-claudemd-merge <target.md> <section.md> <id> [--update]
+# Adds a kit section to a CLAUDE.md between marker lines:
+#   <!-- starter-kit:<id> start -->  ...  <!-- starter-kit:<id> end -->
+# Text outside the markers is never touched. Prints one word on stdout:
+#   added | kept | updated
+# Exit 0 ok, 1 usage error or a file operation failed (the target is left alone), 2 the markers
+# in the target are damaged, or the target is a symlink (nothing written).
+set -u
+
+usage() { echo "usage: starter-kit-claudemd-merge <target.md> <section.md> <id> [--update]" >&2; exit 1; }
+
+[ $# -ge 3 ] || usage
+TARGET="$1"; SECTION="$2"; ID="$3"; shift 3
+UPDATE=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --update) UPDATE=1; shift ;;
+    *) usage ;;
+  esac
+done
+case "$ID" in
+  ''|*[!A-Za-z0-9._-]*) echo "bad id: $ID (use letters, digits, dot, dash, underscore)" >&2; exit 1 ;;
+esac
+[ -f "$SECTION" ] || { echo "section file not found: $SECTION" >&2; exit 1; }
+
+if [ -L "$TARGET" ]; then
+  echo "$TARGET is a link to another file; not changing it — edit the real file or ask for help" >&2
+  exit 2
+fi
+
+START="<!-- starter-kit:$ID start -->"
+END="<!-- starter-kit:$ID end -->"
+
+WORK="$(mktemp -d "${TMPDIR:-/tmp}/starter-kit-md.XXXXXX")" || exit 1
+TMP=""
+trap 'rm -rf "$WORK"; [ -n "$TMP" ] && rm -f "$TMP"' EXIT
+
+# The section text with exactly one trailing newline.
+BODY="$(cat "$SECTION")"
+printf '%s\n' "$BODY" > "$WORK/body"
+
+# Backup (only when the file existed) then swap the finished temp file into place.
+install_result() { # <tmpfile>
+  local tmp="$1" dir bak n mode
+  dir="$(dirname "$TARGET")"
+  mkdir -p "$dir" || exit 1
+  if [ -e "$TARGET" ]; then
+    bak="$TARGET.bak-$(date +%F)"
+    n=2
+    while [ -e "$bak" ]; do bak="$TARGET.bak-$(date +%F)-$n"; n=$((n + 1)); done
+    cp -p "$TARGET" "$bak" || exit 1
+    mode="$(stat -f %Lp "$TARGET" 2>/dev/null || stat -c %a "$TARGET" 2>/dev/null || true)"
+    [ -n "$mode" ] && chmod "$mode" "$tmp"
+  fi
+  mv "$tmp" "$TARGET" || exit 1
+}
+
+new_tmp() { mktemp "$(dirname "$TARGET")/.starter-kit-md.XXXXXX"; }
+
+# No file yet, or an empty one: just the block.
+if [ ! -s "$TARGET" ]; then
+  mkdir -p "$(dirname "$TARGET")" || exit 1
+  TMP="$(new_tmp)" || exit 1
+  { printf '%s\n' "$START"; cat "$WORK/body"; printf '%s\n' "$END"; } > "$TMP"
+  install_result "$TMP"
+  echo added
+  exit 0
+fi
+
+# Find the markers (whole-line matches, first occurrence).
+S_LINE="$(grep -nFx -- "$START" "$TARGET" | head -n 1 | cut -d: -f1)"
+if [ -z "$S_LINE" ]; then
+  # Not there yet: append after exactly one blank line.
+  TMP="$(new_tmp)" || exit 1
+  if ! cp -p "$TARGET" "$TMP"; then
+    echo "could not read $TARGET; nothing was changed" >&2
+    exit 1
+  fi
+  {
+    if [ -n "$(tail -c 1 "$TARGET")" ]; then
+      printf '\n\n'                               # last line had no newline
+    elif [ -n "$(tail -n 1 "$TARGET" | tr -d ' \t\r')" ]; then
+      printf '\n'                                 # last line has text: add the blank line
+    fi                                            # already ends in a blank line: add nothing
+    printf '%s\n' "$START"; cat "$WORK/body"; printf '%s\n' "$END"
+  } >> "$TMP" || { echo "could not write $TMP; nothing was changed" >&2; exit 1; }
+  install_result "$TMP"
+  echo added
+  exit 0
+fi
+
+E_LINE="$(grep -nFx -- "$END" "$TARGET" | cut -d: -f1 | awk -v s="$S_LINE" '$1 > s { print; exit }')"
+if [ -z "$E_LINE" ]; then
+  echo "damaged markers in $TARGET: found \"$START\" but no matching end line. Nothing was changed." >&2
+  exit 2
+fi
+
+if [ "$UPDATE" -eq 0 ]; then
+  echo kept
+  exit 0
+fi
+
+# Compare the text between the markers with the new section.
+sed -n "$((S_LINE + 1)),$((E_LINE - 1))p" "$TARGET" > "$WORK/old"
+if cmp -s "$WORK/old" "$WORK/body"; then
+  echo kept
+  exit 0
+fi
+
+# Replace only the lines between the markers. head/tail copy the rest byte for byte.
+TMP="$(new_tmp)" || exit 1
+{
+  head -n "$S_LINE" "$TARGET"
+  cat "$WORK/body"
+  tail -n +"$E_LINE" "$TARGET"
+} > "$TMP" || { echo "could not read or write $TARGET; nothing was changed" >&2; exit 1; }
+install_result "$TMP"
+echo updated
+exit 0

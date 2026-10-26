@@ -1,0 +1,114 @@
+#!/bin/bash
+# starter-kit-settings-merge <target.json> <defaults.json> [--set <dot.key>]...
+# Merges the kit's defaults into a settings file without overwriting anything the
+# person already has. Reports one line per item on stdout:
+#   filled <key> | kept <key> [(yours: X, kit: Y)] | set <key> | added N allow rules
+# The report is printed only once the file is safely in place (or nothing needed changing).
+# Exit 0 ok, 1 usage error or a write failed, 2 a file is not valid JSON or the target is a
+# symlink (nothing is written).
+set -u
+
+usage() { echo "usage: starter-kit-settings-merge <target.json> <defaults.json> [--set <dot.key>]..." >&2; exit 1; }
+
+[ $# -ge 2 ] || usage
+TARGET="$1"; DEFAULTS="$2"; shift 2
+SETS='[]'
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --set) [ $# -ge 2 ] || usage
+           SETS="$(printf '%s' "$SETS" | jq -c --arg k "$2" '. + [$k]')" || exit 1
+           shift 2 ;;
+    *) usage ;;
+  esac
+done
+
+if [ -L "$TARGET" ]; then
+  echo "$TARGET is a link to another file; not changing it — edit the real file or ask for help" >&2
+  exit 2
+fi
+
+command -v jq >/dev/null 2>&1 || { echo "jq is required but was not found" >&2; exit 1; }
+
+# The kit's defaults must be a JSON object.
+[ -f "$DEFAULTS" ] && jq -e 'type == "object"' "$DEFAULTS" >/dev/null 2>&1 \
+  || { echo "not valid JSON: $DEFAULTS" >&2; exit 2; }
+
+EXISTED=0
+CURRENT='{}'
+if [ -e "$TARGET" ]; then
+  EXISTED=1
+  if [ -s "$TARGET" ] && [ -n "$(tr -d ' \t\r\n' < "$TARGET" | head -c 1)" ]; then
+    jq -e 'type == "object"' "$TARGET" >/dev/null 2>&1 \
+      || { echo "not valid JSON: $TARGET" >&2; exit 2; }
+    CURRENT="$(cat "$TARGET")"
+  fi
+fi
+
+# Left (yours) wins. Returns {v: merged value, r: [report lines]}.
+JQ_PROG='
+def mrg($y; $k; $p):
+  reduce ($k | keys_unsorted[]) as $key ({v: $y, r: []};
+    (($p + [$key]) | join(".")) as $path
+    | $k[$key] as $kv
+    | if ($y | has($key) | not) then
+        if ($kv | type) == "object" then
+          mrg({}; $kv; $p + [$key]) as $sub
+          | .v[$key] = $sub.v | .r += $sub.r
+        elif $path == "permissions.allow" and ($kv | type) == "array" then
+          (reduce $kv[] as $x ([]; if index([$x]) then . else . + [$x] end)) as $u
+          | .v[$key] = $u
+          | if ($u | length) > 0 then .r += ["added \($u | length) allow rules"] else . end
+        else
+          .v[$key] = $kv | .r += ["filled \($path)"]
+        end
+      else
+        $y[$key] as $yv
+        | if ($yv | type) == "object" and ($kv | type) == "object" then
+            mrg($yv; $kv; $p + [$key]) as $sub
+            | .v[$key] = $sub.v | .r += $sub.r
+          elif $path == "permissions.allow" and ($yv | type) == "array" and ($kv | type) == "array" then
+            (reduce $kv[] as $x ({all: $yv, n: 0};
+               if (.all | index([$x])) then . else .all += [$x] | .n += 1 end)) as $u
+            | .v[$key] = $u.all
+            | if $u.n > 0 then .r += ["added \($u.n) allow rules"] else . end
+          elif $yv == $kv then
+            .r += ["kept \($path)"]
+          elif ($sets | index([$path])) then
+            .v[$key] = $kv | .r += ["set \($path)"]
+          else
+            .r += ["kept \($path) (yours: \($yv | tojson), kit: \($kv | tojson))"]
+          end
+      end);
+mrg($cur; $def[0]; [])'
+
+RESULT="$(jq -n -c --argjson cur "$CURRENT" --slurpfile def "$DEFAULTS" --argjson sets "$SETS" "$JQ_PROG")" \
+  || { echo "could not merge $TARGET" >&2; exit 2; }
+
+REPORT="$(printf '%s' "$RESULT" | jq -r '.r[]')" || { echo "could not merge $TARGET" >&2; exit 2; }
+say() { [ -z "$REPORT" ] || printf '%s\n' "$REPORT"; }
+
+NEW_SORTED="$(printf '%s' "$RESULT" | jq -S '.v')"
+OLD_SORTED="$(printf '%s' "$CURRENT" | jq -S '.')"
+if [ "$EXISTED" -eq 1 ] && [ "$NEW_SORTED" = "$OLD_SORTED" ]; then
+  say
+  exit 0   # nothing changed: no write, no backup
+fi
+
+DIR="$(dirname "$TARGET")"
+mkdir -p "$DIR" || exit 1
+TMP="$(mktemp "$DIR/.starter-kit-merge.XXXXXX")" || exit 1
+trap 'rm -f "$TMP"' EXIT
+printf '%s' "$RESULT" | jq --indent 2 '.v' > "$TMP" || exit 1
+
+if [ "$EXISTED" -eq 1 ]; then
+  BAK="$TARGET.bak-$(date +%F)"
+  n=2
+  while [ -e "$BAK" ]; do BAK="$TARGET.bak-$(date +%F)-$n"; n=$((n + 1)); done
+  cp -p "$TARGET" "$BAK" || exit 1
+  MODE="$(stat -f %Lp "$TARGET" 2>/dev/null || stat -c %a "$TARGET" 2>/dev/null || true)"
+  [ -n "$MODE" ] && chmod "$MODE" "$TMP"
+fi
+mv "$TMP" "$TARGET" || { echo "could not write $TARGET; nothing was changed" >&2; exit 1; }
+trap - EXIT
+say
+exit 0

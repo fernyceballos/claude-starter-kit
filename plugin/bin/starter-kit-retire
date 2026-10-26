@@ -1,0 +1,34 @@
+#!/bin/bash
+# starter-kit-retire <skill-name>...
+# Moves each personal skill folder $HOME/.claude/skills/<name> aside into
+# $HOME/.claude/skills-retired-YYYY-MM-DD/<name> (adding -2, -3 ... if that name is taken).
+# Nothing is ever deleted. Prints "retired <name> -> <destination>" per name.
+# A name that is not a folder directly inside ~/.claude/skills, or that contains "/" or "..",
+# is refused with a reason and nothing is moved for it; the other names still run.
+# Exit 0 if every name was retired, 2 on bad usage or if any name was refused.
+set -u
+
+[ $# -ge 1 ] || { echo "usage: starter-kit-retire <skill-name>..." >&2; exit 2; }
+
+SKILLS="$HOME/.claude/skills"
+RETIRED="$HOME/.claude/skills-retired-$(date +%F)"
+status=0
+
+for name in "$@"; do
+  case "$name" in
+    ''|.|..|*/*|*..*)
+      echo "refused [$name]: not a plain skill folder name" >&2; status=2; continue ;;
+  esac
+  if [ ! -d "$SKILLS/$name" ]; then
+    echo "refused $name: no such folder in $SKILLS" >&2; status=2; continue
+  fi
+  mkdir -p "$RETIRED" || { echo "refused $name: could not create $RETIRED" >&2; status=2; continue; }
+  dest="$RETIRED/$name"; n=2
+  while [ -e "$dest" ]; do dest="$RETIRED/$name-$n"; n=$((n + 1)); done
+  if mv "$SKILLS/$name" "$dest"; then
+    echo "retired $name -> $dest"
+  else
+    echo "refused $name: the move failed" >&2; status=2
+  fi
+done
+exit "$status"

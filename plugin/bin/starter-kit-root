@@ -1,0 +1,4 @@
+#!/bin/bash
+# Prints the starter-kit plugin folder (the parent of this script's bin/).
+set -u
+cd "$(dirname "$0")/.." && pwd
