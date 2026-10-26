@@ -1,5 +1,10 @@
 # What's new in the starter kit
 
+## 0.1.2 — 2026-10-26
+
+- Setup now offers **all three** (operator, researcher and builder) as a choice, for when you
+  want a bit of everything in one folder.
+
 ## 0.1.1 — 2026-10-26
 
 - Setup now works in the Claude desktop app. The app keeps the plugins it installs in its own

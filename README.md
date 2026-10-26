@@ -7,6 +7,7 @@ Ferny uses, tuned to what you want to do:
   in your own browser.
 - **Researcher**: Claude studies a profile, videos or a market and tells you what works.
 - **Builder**: Claude builds an app, portal or website with code.
+- **All three**: a bit of everything, in one folder.
 
 It also teaches you the way of working that keeps Claude sharp: one chat per job, **wind down**
 at the end, **continue in new session** when a chat gets full, and nothing goes live without
