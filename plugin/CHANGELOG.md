@@ -1,5 +1,11 @@
 # What's new in the starter kit
 
+## 0.1.4 — 2026-10-26
+
+- The coach and setup now say where to see how full a chat is in the desktop app: the
+  **Context** percentage in the panel on the right. The meter at the bottom of the screen only
+  shows in the Terminal, and the desktop app's number doesn't remind you at 60%, so glance at it.
+
 ## 0.1.3 — 2026-10-26
 
 - Setup no longer sends desktop app users looking for an auto-update switch. The app doesn't have

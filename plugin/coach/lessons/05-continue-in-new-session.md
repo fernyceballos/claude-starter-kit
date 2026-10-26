@@ -15,11 +15,14 @@ message to paste into a new chat.
 gets lost when you switch chats, even things you only said out loud in the chat.
 
 ## How you'll know it's time
-- The bottom of your screen says **"chat 60% full → say continue in new session"**.
+- **In the desktop app:** the **Context** number on the right side reaches **60%**. It won't
+  remind you, so glance at it now and then.
+- **In the Terminal:** the bottom of your screen says **"chat 60% full → say continue in new
+  session"**.
 - Or Claude tells you the chat "just got squeezed to make room".
 
 ## Try it now
-Nothing to do yet. Just remember the 60% sign. When you see it, say **continue in new session**,
-then paste the message Claude gives you into a new chat.
+Nothing to do yet. Just remember 60%. When you see it, say **continue in new session**, then
+paste the message Claude gives you into a new chat.
 
 Video: __VIDEO_05__

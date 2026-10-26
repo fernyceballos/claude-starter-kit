@@ -16,8 +16,13 @@ project's notes (the files in its `docs` folder) at the start of every chat. "Wi
 is how the notes get written.
 
 ## Try it now
-Look at the bottom of your screen. You'll see something like **"chat 3% full"**. That number
-goes up as you talk. When it gets near 60%, type **continue in new session** (lesson 5 shows how).
-Don't just open a new chat then, or the half-done work won't be in the notes yet.
+Find out how full this chat is:
+- **In the desktop app:** look at the panel on the right side, under **Context**. You'll see a
+  number like **20%**. Click it to see what's using the space. (Panel hidden? Open it with the
+  panel button at the top right of the window.)
+- **In the Terminal:** look at the bottom of your screen for something like **"chat 3% full"**.
+
+That number goes up as you talk. When it gets near 60%, type **continue in new session** (lesson 5
+shows how). Don't just open a new chat then, or the half-done work won't be in the notes yet.
 
 Video: __VIDEO_01__

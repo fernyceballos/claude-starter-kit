@@ -123,8 +123,11 @@ ones (reading files, listing folders) without asking.
 ### 6. The chat-fullness meter
 
 `mkdir -p ~/.claude/starter-kit && cp "$ROOT/bin/starter-kit-statusline" ~/.claude/starter-kit/statusline.sh`.
-Tell them the bottom of the screen will show how full the chat is, and that at 60% it reminds
-them to say *continue in new session*.
+Tell them where to see how full the chat is, and that at 60% it's time to say *continue in new
+session*:
+- **Desktop app:** the **Context** percentage in the panel on the right side. It doesn't remind
+  them, so they glance at it now and then. (The meter below is only shown in the Terminal.)
+- **Terminal:** the bottom of the screen shows "chat N% full", and at 60% it reminds them.
 
 ### 7. Design systems
 
