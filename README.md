@@ -25,7 +25,8 @@ Your setup takes about 20–30 minutes, most of it waiting for installs.
 
 - **New kind of work?** Make a new folder, open it in Claude Code, and say **start a project**.
 - **Grow this folder?** Say **upgrade this project**.
-- **Get the newest version:** say **update the kit** (or turn on auto-update; setup shows you how).
+- **Get the newest version:** say **update the kit**. (In the terminal you can also turn on
+  auto-update, and setup shows you how. The desktop app updates by hand only.)
 - **Forgot how something works?** Say **coach me**.
 - **Stuck?** Contact ferny@attractionmarketing.com.
 

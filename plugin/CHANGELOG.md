@@ -1,5 +1,12 @@
 # What's new in the starter kit
 
+## 0.1.3 — 2026-10-26
+
+- Setup no longer sends desktop app users looking for an auto-update switch. The app doesn't have
+  one, so it explains how to update by hand instead: say **update the kit**, or click Check for
+  updates, then Update.
+- Corrected clicks for updating the kit and for switching off an old add-on in the desktop app.
+
 ## 0.1.2 — 2026-10-26
 
 - Setup now offers **all three** (operator, researcher and builder) as a choice, for when you
