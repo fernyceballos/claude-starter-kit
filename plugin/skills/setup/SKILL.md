@@ -13,7 +13,7 @@ technical question. Report each step as **done**, **kept** (already theirs, left
 ## Find the kit's folder first
 
 Run `starter-kit-root`. If that command isn't found (it isn't on the path yet in the same chat as
-the install), use `{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions -path '*/rpm/plugin_*/.claude-plugin/plugin.json' -exec grep -l '"name": *"starter-kit"' {} + | sed 's|/.claude-plugin/plugin.json$||'; } 2>/dev/null | head -1` (it checks both places the kit can be installed: the `claude` command's record,
+the install), use `{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions -path '*/rpm/plugin_*/.claude-plugin/plugin.json' -exec grep -l '"name": *"starter-kit"' {} + | sed 's|/.claude-plugin/plugin.json$||'; } 2>/dev/null | while read -r d; do [ -f "$d/.claude-plugin/plugin.json" ] && printf '%s\t%s\n' "$(jq -r .version "$d/.claude-plugin/plugin.json")" "$d"; done | sort -t. -k1,1n -k2,2n -k3,3n | tail -1 | cut -f2` (it checks both places the kit can be installed: the `claude` command's record,
 then the desktop app's own plugin folder). Call it `ROOT` below, and call its scripts as
 `"$ROOT/bin/<name>"`.
 
@@ -200,7 +200,7 @@ real job."
 1. Note the current version from `$ROOT/.claude-plugin/plugin.json`.
 2. `claude plugin marketplace update starter-kit-marketplace`
 3. `claude plugin update starter-kit@starter-kit-marketplace`
-4. Find the new version by running `{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions -path '*/rpm/plugin_*/.claude-plugin/plugin.json' -exec grep -l '"name": *"starter-kit"' {} + | sed 's|/.claude-plugin/plugin.json$||'; } 2>/dev/null | head -1` again (an update installs into a new folder),
+4. Find the new version by running `{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions -path '*/rpm/plugin_*/.claude-plugin/plugin.json' -exec grep -l '"name": *"starter-kit"' {} + | sed 's|/.claude-plugin/plugin.json$||'; } 2>/dev/null | while read -r d; do [ -f "$d/.claude-plugin/plugin.json" ] && printf '%s\t%s\n' "$(jq -r .version "$d/.claude-plugin/plugin.json")" "$d"; done | sort -t. -k1,1n -k2,2n -k3,3n | tail -1 | cut -f2` again (an update installs into a new folder),
    read its `.claude-plugin/plugin.json`, and report old → new. Then refresh the pieces that live
    outside the plugin, using the NEW folder: copy its `bin/starter-kit-statusline` over
    `~/.claude/starter-kit/statusline.sh`, and run its `skills/design-systems/refresh.sh` (quick if

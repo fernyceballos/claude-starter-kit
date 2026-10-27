@@ -70,7 +70,7 @@ from: Anthropic's own plugin list (Superpowers) goes into the app's own folder, 
    If either one fails with a sign-in or "not found" error, run `gh auth setup-git` again and
    retry once.
 
-6. Find the installed kit: `{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions -path '*/rpm/plugin_*/.claude-plugin/plugin.json' -exec grep -l '"name": *"starter-kit"' {} + | sed 's|/.claude-plugin/plugin.json$||'; } 2>/dev/null | head -1`
+6. Find the installed kit: `{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions -path '*/rpm/plugin_*/.claude-plugin/plugin.json' -exec grep -l '"name": *"starter-kit"' {} + | sed 's|/.claude-plugin/plugin.json$||'; } 2>/dev/null | while read -r d; do [ -f "$d/.claude-plugin/plugin.json" ] && printf '%s\t%s\n' "$(jq -r .version "$d/.claude-plugin/plugin.json")" "$d"; done | sort -t. -k1,1n -k2,2n -k3,3n | tail -1 | cut -f2`
    (it checks both places the kit can be installed: the `claude` command's record, then the
    desktop app's own plugin folder). If it prints nothing, the install in step 5 didn't finish:
    go back to it. Read `skills/setup/SKILL.md` in that folder and follow it now, in this chat,

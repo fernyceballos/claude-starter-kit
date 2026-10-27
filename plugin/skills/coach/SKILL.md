@@ -7,7 +7,7 @@ description: Use when the person says "coach me", "continue the coach", "teach m
 
 The lessons are in the kit folder: run `starter-kit-root` and look in `coach/lessons/`. (If
 `starter-kit-root` isn't found, the kit folder is
-`{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions -path '*/rpm/plugin_*/.claude-plugin/plugin.json' -exec grep -l '"name": *"starter-kit"' {} + | sed 's|/.claude-plugin/plugin.json$||'; } 2>/dev/null | head -1`, and the state helper is its
+`{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions -path '*/rpm/plugin_*/.claude-plugin/plugin.json' -exec grep -l '"name": *"starter-kit"' {} + | sed 's|/.claude-plugin/plugin.json$||'; } 2>/dev/null | while read -r d; do [ -f "$d/.claude-plugin/plugin.json" ] && printf '%s\t%s\n' "$(jq -r .version "$d/.claude-plugin/plugin.json")" "$d"; done | sort -t. -k1,1n -k2,2n -k3,3n | tail -1 | cut -f2`, and the state helper is its
 `bin/starter-kit-state`.) The lessons are (files
 `01-…md` to `08-…md`). Each has a `kits:` list at the top, then **What**, **Why**, **Try it
 now**, and a `Video:` line.

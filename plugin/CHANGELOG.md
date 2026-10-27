@@ -1,5 +1,10 @@
 # What's new in the starter kit
 
+## 0.1.6 — 2026-10-27
+
+- Fixed: after an update in the desktop app, setup, the coach and the guide could open an older
+  copy of the kit if the app still keeps one. They now always pick the newest copy.
+
 ## 0.1.5 — 2026-10-26
 
 - **New: your field guide.** One page with every phrase you can say, when to say it, the route of

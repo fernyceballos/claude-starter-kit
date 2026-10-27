@@ -6,7 +6,7 @@ description: Use when the person says "show me the guide", "the guide", "field g
 # Guide: the field guide, as a page they keep
 
 The guide is a ready-made page in the kit: `$ROOT/guide/field-guide.html`. Find `ROOT` by running
-`starter-kit-root`; if that isn't found, use `{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions -path '*/rpm/plugin_*/.claude-plugin/plugin.json' -exec grep -l '"name": *"starter-kit"' {} + | sed 's|/.claude-plugin/plugin.json$||'; } 2>/dev/null | head -1`.
+`starter-kit-root`; if that isn't found, use `{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions -path '*/rpm/plugin_*/.claude-plugin/plugin.json' -exec grep -l '"name": *"starter-kit"' {} + | sed 's|/.claude-plugin/plugin.json$||'; } 2>/dev/null | while read -r d; do [ -f "$d/.claude-plugin/plugin.json" ] && printf '%s\t%s\n' "$(jq -r .version "$d/.claude-plugin/plugin.json")" "$d"; done | sort -t. -k1,1n -k2,2n -k3,3n | tail -1 | cut -f2`.
 The state helper is `"$ROOT/bin/starter-kit-state"`; the kit version is in
 `$ROOT/.claude-plugin/plugin.json`.
 
