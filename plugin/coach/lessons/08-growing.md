@@ -16,8 +16,9 @@ Want to try a new kind of work? Make a new folder, open it in Claude Code, and s
 Keeping different work in different folders keeps each one's notes clear. Everything you need
 is already installed, so you never have to come back to setup prompts.
 
-## Try it now
+## Next time
 Think of a second thing you'd like Claude to help with. Is it the same kind of work as this
-folder, or a new kind?
+folder, or a new kind? Don't say **start a project** here. When you're ready, make the new
+folder first, open it in Claude Code, and say it there.
 
 Video: __VIDEO_08__

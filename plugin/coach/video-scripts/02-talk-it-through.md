@@ -18,4 +18,5 @@ that part. If something's off, just say so. That's the cheapest moment to fix it
 And if you're in a hurry and don't want the questions, say "just start." It'll make sensible
 choices and tell you what it picked.
 
-Try it now: start a chat with "I'd like help with…" and see what it asks you.
+Next time you have something you want help with, start the chat with "I'd like help with…"
+and see what it asks you.

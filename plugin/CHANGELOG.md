@@ -1,5 +1,12 @@
 # What's new in the starter kit
 
+## 0.1.7 — 2026-10-29
+
+- The coach no longer invites you to type a phrase like **wind down** in the middle of the
+  lessons. Lessons you can try on the spot still say **Try it now**. The rest say **Next time**,
+  and tell you to save the phrase for a real job, because those phrases do real work (wind down
+  would close out the coach chat).
+
 ## 0.1.6 — 2026-10-27
 
 - Fixed: after an update in the desktop app, setup, the coach and the guide could open an older

@@ -21,8 +21,9 @@ gets lost when you switch chats, even things you only said out loud in the chat.
   session"**.
 - Or Claude tells you the chat "just got squeezed to make room".
 
-## Try it now
-Nothing to do yet. Just remember 60%. When you see it, say **continue in new session**, then
-paste the message Claude gives you into a new chat.
+## Next time
+Don't type it now. This chat isn't full, and there's no half-done job to hand over. Just remember
+60%. When you see it during a real job, say **continue in new session**, then paste the message
+Claude gives you into a new chat.
 
 Video: __VIDEO_05__
