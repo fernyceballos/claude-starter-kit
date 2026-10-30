@@ -24,8 +24,8 @@ Feeling confident after a few weeks? Type **autopilot dev** after you've talked 
 and Claude builds and tests it on your computer without asking more questions. It stops before
 anything goes live.
 
-## Try it now
-Start a new chat in this folder and look at the top of the chat for a name like
-`claude/fix-signup-form`. That's this chat's own copy (its "branch").
+## Next time
+Next time you start a new chat in this folder, look at the top of the chat for a name like
+`claude/fix-signup-form`. That's that chat's own copy (its "branch").
 
 Video: __VIDEO_07__

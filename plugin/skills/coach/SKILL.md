@@ -9,8 +9,9 @@ The lessons are in the kit folder: run `starter-kit-root` and look in `coach/les
 `starter-kit-root` isn't found, the kit folder is
 `{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions -path '*/rpm/plugin_*/.claude-plugin/plugin.json' -exec grep -l '"name": *"starter-kit"' {} + | sed 's|/.claude-plugin/plugin.json$||'; } 2>/dev/null | while read -r d; do [ -f "$d/.claude-plugin/plugin.json" ] && printf '%s\t%s\n' "$(jq -r .version "$d/.claude-plugin/plugin.json")" "$d"; done | sort -t. -k1,1n -k2,2n -k3,3n | tail -1 | cut -f2`, and the state helper is its
 `bin/starter-kit-state`.) The lessons are (files
-`01-…md` to `08-…md`). Each has a `kits:` list at the top, then **What**, **Why**, **Try it
-now**, and a `Video:` line.
+`01-…md` to `08-…md`). Each has a `kits:` list at the top, then **What**, **Why**, either
+**Try it now** (safe to do right here in the coach chat) or **Next time** (for a real job later),
+and a `Video:` line.
 
 ## Which lessons apply here
 
@@ -32,9 +33,13 @@ when the person says yes or "coach me".
    (`$ROOT/skills/guide/SKILL.md`) now to publish it, and give the link in one line before the
    lesson: "Here's your field guide to keep: every phrase, on one page." Then show the lesson.
 3. Show the **next** lesson that applies and isn't done. Show it as written: its heading, What,
-   Why, Try it now, in the lesson's own words. Keep it to one screen.
+   Why, and Try it now or Next time, in the lesson's own words. Keep it to one screen.
 4. **Video line:** if it starts with `__VIDEO`, say "(video coming soon)". Otherwise give the link.
-5. End with one line: "Try it, or say **next** to keep going."
+5. End with one line. If the lesson has **Try it now**: "Try it, or say **next** to keep going."
+   If it has **Next time**: "Say **next** to keep going." Never invite them to type a lesson's
+   phrase (wind down, continue in new session, start a project, autopilot) during the
+   walkthrough. Those phrases do real work: wind down would close out a chat that only did the
+   coach.
 6. When they try it or say next, run `starter-kit-state coach mark <n>` (the number without a
    leading zero: lesson `04-…` is `4`), then go to the next lesson.
 7. When every applicable lesson is done, run `starter-kit-state set coach-done yes`. Close with a
@@ -54,5 +59,6 @@ lesson 4. Say *coach me* for the full walkthrough." Don't mark anything done.
 
 - Short sentences, everyday words, about a 6th-grade reading level. If a technical word is
   needed, explain it in the same sentence.
-- Encouraging, not cheesy. No quizzes. The "try it" is always optional.
+- Encouraging, not cheesy. No quizzes. The "try it" is always optional, and a "next time" is
+  something to do later in a real job, never in the coach chat.
 - Their own words beat yours: if they say they already do something, mark that lesson done and move on.

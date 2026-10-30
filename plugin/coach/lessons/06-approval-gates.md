@@ -16,7 +16,7 @@ runs something on your computer.
 Your accounts are real. A message can't be unsent, and a post can't be un-seen. So these stay
 your call, every time. A yes covers **that one action only**, not the next one.
 
-## Try it now
+## Next time
 Next time Claude asks "OK to publish?", read what it's about to do before you say yes. If it
 didn't show you the exact words or who gets them, ask it to.
 

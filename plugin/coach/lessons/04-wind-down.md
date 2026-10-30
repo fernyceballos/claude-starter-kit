@@ -15,7 +15,8 @@ you the same questions again.
 It only works when your message **starts** with "wind down". Just talking *about* winding down
 doesn't set it off.
 
-## Try it now
-At the end of your next real job, type **wind down** and read what Claude writes in the notes.
+## Next time
+Don't type it now. **Wind down** is for the end of a real job, and this chat is just the coach.
+When your next real job is finished, type **wind down** and read what Claude writes in the notes.
 
 Video: __VIDEO_04__
