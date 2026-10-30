@@ -1,5 +1,11 @@
 # What's new in the starter kit
 
+## 0.1.8 — 2026-10-30
+
+- If you say **wind down** or **continue in new session** in a chat that only did the coach (or
+  only talked), Claude now just tells you there's nothing to save, instead of writing notes about
+  nothing. In a chat that did real work, both work the same as before.
+
 ## 0.1.7 — 2026-10-29
 
 - The coach no longer invites you to type a phrase like **wind down** in the middle of the

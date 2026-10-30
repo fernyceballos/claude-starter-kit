@@ -11,6 +11,16 @@ or trusts a wrong status. **The record is the deliverable.** A kickoff prompt is
 earn only after the record is true. Doing the kickoff first is exactly the failure this skill
 prevents.
 
+**Nothing to close out? Check this first.** Look at what this chat actually did. If it changed
+nothing (no files made or edited in this folder, no commits, nothing changed in the person's
+accounts or tools; in a git folder, `git status` is clean too) and only did the coach, the field
+guide, or questions and answers, there is nothing to record. Marking coach lessons done and
+publishing the field guide don't count as changes. Then don't edit the record files, don't commit
+or merge, and don't write a kickoff. Say: "This chat only did the coach, so there's nothing to
+record. You can just close it. Save **wind down** for the end of a real job." (If it only talked,
+say "only talked" instead of "only did the coach".) If they say "wind down anyway", run the steps
+below. If anything did change, or you aren't sure, run the steps below as usual.
+
 **Finished or not?** If the work is NOT finished, stop and use `continue-in-new-session`
 instead. If you can't tell, ask one question: "Is this finished, or are we continuing next time?"
 
@@ -93,7 +103,8 @@ verdict (and help verdict, if any).
 
 ## The hard gate
 
-Don't say "wound down" until: everything (including any KICKOFF.md change) is committed and, in a
+(A chat with nothing to close out skips all of this; see the check at the top.) Don't say
+"wound down" until: everything (including any KICKOFF.md change) is committed and, in a
 worktree, merged into `main` · STATUS and BACKLOG match reality **and** carry today's date · the
 log entry has old values and "not checked" · the playbook verdict is stated · test items and
 running things are reported · tabs you opened are closed.

@@ -17,6 +17,17 @@ gone, half-built things look finished, and ideas the person already rejected get
 | Tests | Expected to pass | **Whatever they are, written down honestly** |
 | Kickoff prompt | Optional | **Required — it's the main thing this produces** |
 
+**Nothing to hand over? Check this first.** Look at what this chat actually did. If it changed
+nothing (no files made or edited in this folder, no commits, nothing changed in the person's
+accounts or tools; in a git folder, `git status` is clean too) and only did the coach, the field
+guide, or questions and answers, there's no half-done job to hand over. Marking coach lessons
+done and publishing the field guide don't count as changes. Then don't edit the record files,
+don't commit, and don't write a kickoff. Say: "This chat only did the coach, so there's no
+half-done job to hand over. You can just close it, and start a new chat when you have a real
+job." (If it only talked, say "only talked" instead of "only did the coach".) If they still want
+a handoff, run the steps below. If anything did change, or you aren't sure, run the steps below
+as usual.
+
 **REQUIRED:** use `writing-session-log-entries` for the log entry. Make one todo per step and
 **don't change the order**.
 
@@ -101,7 +112,8 @@ Paste it in chat in a code box **and** save it to `docs/KICKOFF.md` (replace wha
 
 ## The hard gate
 
-Don't say "ready to continue" until: the snapshot and old values are written · BACKLOG and
+(A chat with nothing to hand over skips all of this; see the check at the top.) Don't say
+"ready to continue" until: the snapshot and old values are written · BACKLOG and
 STATUS say IN PROGRESS with the stopping point · everything is committed (and merged to `main` in
 a worktree) · the kickoff is pasted in chat **and** saved · tabs you opened are closed or described.
 
