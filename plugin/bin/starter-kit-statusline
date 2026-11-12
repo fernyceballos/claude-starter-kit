@@ -9,6 +9,8 @@ set -u
 fallback() { printf 'chat —\n'; exit 0; }
 
 command -v jq >/dev/null 2>&1 || fallback
+# -b: Windows' jq (jq.exe in Git Bash) ends lines with CRLF without it. Old jq (1.6) has no -b.
+if command jq -b -n 1 >/dev/null 2>&1; then jq() { command jq -b "$@"; }; fi
 
 PCT="$(jq -r '
   try (

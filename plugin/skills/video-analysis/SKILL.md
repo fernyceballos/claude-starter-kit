@@ -12,10 +12,15 @@ demos and screen recordings carry things the words don't.
 ## Tools (check once, install only with a yes)
 
 - `yt-dlp` (downloads videos and captions from a link) and `ffmpeg` / `ffprobe` (cuts frames and
-  audio). Missing → `brew install yt-dlp ffmpeg`, after the person says yes.
+  audio). Missing → after the person says yes: on a Mac `brew install yt-dlp ffmpeg`; on a Windows
+  PC `winget install --id yt-dlp.yt-dlp -e --accept-source-agreements --accept-package-agreements`
+  and `winget install --id Gyan.FFmpeg -e --accept-source-agreements --accept-package-agreements`
+  (then Claude needs a restart to see them).
 - **Transcripts:** if `OPENAI_API_KEY` is set, use OpenAI's `whisper-1` (fast; about $0.36 per
-  hour of audio). Otherwise use the free local `whisper-cli` (`brew install whisper-cpp`, plus a
-  one-time model download of about 150 MB). It's slower, and each install needs a yes first.
+  hour of audio). Otherwise, on a Mac, use the free local `whisper-cli` (`brew install whisper-cpp`,
+  plus a one-time model download of about 150 MB). It's slower, and each install needs a yes
+  first. On a Windows PC there's no simple local install: ask the person whether to add an OpenAI
+  key or work from the captions and frames only.
 - Work in `.tmp/video/<short-name>/` so downloads never get committed.
 
 ## Steps, in order

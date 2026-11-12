@@ -1,5 +1,24 @@
 # What's new in the starter kit
 
+## 0.2.0 — 2026-11-12
+
+- **Works on Windows PCs now.** The same setup prompt asks whether you're on a Mac or a PC. On a PC
+  it installs three free tools, asks you to restart Claude once, and carries on.
+- **No Terminal needed during setup.** When you have to run a command yourself (installing
+  Homebrew, signing in to GitHub), Claude puts it in a box with a **Run** button. Click it, and the
+  command runs in a panel inside the Claude app, where you answer anything it asks.
+- Fixed: on some computers the desktop app keeps plugins in a folder setup didn't look in, so it
+  said Superpowers wasn't installed when it was. Setup, the coach and the guide now look in every
+  folder we've seen the app use.
+- If you paste the setup prompt into a cloud session, or a chat with no folder picked, Claude now
+  tells you right away to start again on your own computer in a real folder, so nothing gets lost.
+- Setting up several kinds of project at once no longer leaves extra backup files in your folder.
+  You get one backup of each file you had before, and none of files setup just made.
+- On a PC, the first save no longer prints a wall of "LF will be replaced by CRLF" warnings.
+- Setup's last message now says you don't need to wind down the setup chat.
+- The coach now tells you if the automatic phrases (like **wind down**) aren't working on your
+  computer yet, and how to fix it.
+
 ## 0.1.8 — 2026-10-30
 
 - If you say **wind down** or **continue in new session** in a chat that only did the coach (or

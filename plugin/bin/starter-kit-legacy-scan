@@ -11,6 +11,8 @@
 set -u
 
 command -v jq >/dev/null 2>&1 || { echo "jq is required" >&2; exit 2; }
+# -b: Windows' jq (jq.exe in Git Bash) ends lines with CRLF without it. Old jq (1.6) has no -b.
+if command jq -b -n 1 >/dev/null 2>&1; then jq() { command jq -b "$@"; }; fi
 
 PLUGIN="$(cd "$(dirname "$0")/.." && pwd)"
 SKILLS="$HOME/.claude/skills"

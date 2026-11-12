@@ -22,6 +22,8 @@
 set -u
 
 command -v jq >/dev/null 2>&1 || exit 0
+# -b: Windows' jq (jq.exe in Git Bash) ends lines with CRLF without it. Old jq (1.6) has no -b.
+if command jq -b -n 1 >/dev/null 2>&1; then jq() { command jq -b "$@"; }; fi
 
 input="$(cat)"
 prompt="$(printf '%s' "$input" | jq -r '.prompt // empty' 2>/dev/null)" || exit 0

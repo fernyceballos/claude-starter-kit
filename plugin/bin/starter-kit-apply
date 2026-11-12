@@ -1,18 +1,62 @@
 #!/bin/bash
-# starter-kit-apply <operator|researcher|builder> <folder>
-# Sets up a folder with one starter kit without overwriting anything. Prints one line per item:
+# starter-kit-apply <operator|researcher|builder>... <folder>
+# Sets up a folder with one or more starter kits without overwriting anything. Prints one line per item:
 #   filled docs/X | kept docs/X | CLAUDE.md <id>: added|kept | settings: <report> |
 #   git: initialized|already a repo | filled|added N|kept .gitignore
+# (plus a "warning: … inside OneDrive …" line first when the folder is inside OneDrive)
 # and finishes with "applied <kit> to <folder>". It never commits and never runs `git add`.
 # Exit 0 ok, 2 bad arguments, an unknown kit, an unsafe folder (/, home, Desktop, Documents,
-# Downloads) or a settings file that is not valid JSON, 1 when a step failed (a docs file that
+# Downloads, and on a PC OneDrive and its Desktop and Documents) or a settings file that is not valid JSON, 1 when a step failed (a docs file that
 # could not be copied, a merge that failed): the final "applied" line is then not printed.
 set -u
 
 PLUGIN="$(cd "$(dirname "$0")/.." && pwd)"
 KITS="$PLUGIN/kits"
 
-usage() { echo "usage: starter-kit-apply <operator|researcher|builder> <folder>" >&2; exit 2; }
+usage() { echo "usage: starter-kit-apply <operator|researcher|builder>... <folder>" >&2; exit 2; }
+
+# Several kits: apply them one by one, in the order given, but keep only one backup of each file
+# the person had BEFORE this run. Without this, the second kit backs up the CLAUDE.md, settings
+# and .gitignore the first kit made seconds earlier, which leaves clutter that holds nothing of
+# theirs. Ends with "applied <kit> <kit>... to <folder>".
+if [ $# -gt 2 ]; then
+  FOLDER="${!#}"
+  KITLIST=("${@:1:$#-1}")
+  for k in "${KITLIST[@]}"; do
+    case "$k" in operator|researcher|builder) ;;
+      *) echo "unknown kit: $k (use operator, researcher or builder)" >&2; exit 2 ;; esac
+  done
+  SNAP="$(mktemp -d "${TMPDIR:-/tmp}/starter-kit-apply.XXXXXX")" || exit 1
+  trap 'rm -rf "$SNAP"' EXIT
+  TRACKED=(CLAUDE.md .claude/settings.json .gitignore)
+  i=0
+  for f in "${TRACKED[@]}"; do
+    [ -f "$FOLDER/$f" ] && cp -p "$FOLDER/$f" "$SNAP/orig-$i"
+    ls -d "$FOLDER/$f".bak-* 2>/dev/null | LC_ALL=C sort > "$SNAP/baks-$i"
+    i=$((i + 1))
+  done
+  for k in "${KITLIST[@]}"; do
+    out="$(bash "$0" "$k" "$FOLDER")"; rc=$?
+    printf '%s\n' "$out" | grep -v '^applied ' 
+    [ "$rc" -eq 0 ] || exit "$rc"
+  done
+  i=0
+  for f in "${TRACKED[@]}"; do
+    made=0
+    while IFS= read -r b; do
+      [ -n "$b" ] || continue
+      grep -qxF -- "$b" "$SNAP/baks-$i" || { rm -f "$b"; made=1; }
+    done < <(ls -d "$FOLDER/$f".bak-* 2>/dev/null | LC_ALL=C sort)
+    if [ "$made" -eq 1 ] && [ -f "$SNAP/orig-$i" ] && ! cmp -s "$SNAP/orig-$i" "$FOLDER/$f"; then
+      b="$FOLDER/$f.bak-$(date +%F)" n=2
+      while [ -e "$b" ]; do b="$FOLDER/$f.bak-$(date +%F)-$n"; n=$((n + 1)); done
+      cp -p "$SNAP/orig-$i" "$b"
+    fi
+    i=$((i + 1))
+  done
+  echo "applied ${KITLIST[*]} to $FOLDER"
+  exit 0
+fi
 
 [ $# -eq 2 ] || usage
 KIT="$1"; FOLDER="$2"
@@ -39,14 +83,30 @@ unsafe=0
 [ "$RESOLVED" = "/" ] && unsafe=1
 for h in "$HOME_RAW" "$HOME_REAL"; do
   [ -n "$h" ] || continue
-  for u in "$h" "$h/Desktop" "$h/Documents" "$h/Downloads"; do
+  for u in "$h" "$h/Desktop" "$h/Documents" "$h/Downloads" \
+           "$h/OneDrive" "$h/OneDrive/Desktop" "$h/OneDrive/Documents"; do
     [ "$RESOLVED" = "$u" ] && unsafe=1
+  done
+  # Work PCs name it "OneDrive - <company>".
+  for od in "$h"/OneDrive\ -\ *; do
+    [ -d "$od" ] || continue
+    for u in "$od" "$od/Desktop" "$od/Documents"; do
+      [ "$RESOLVED" = "$u" ] && unsafe=1
+    done
   done
 done
 if [ "$unsafe" -eq 1 ]; then
   echo "won't set up $FOLDER: pick or make a project folder, e.g. ~/Projects/<name>" >&2
   exit 2
 fi
+for h in "$HOME_RAW" "$HOME_REAL"; do
+  [ -n "$h" ] || continue
+  case "$RESOLVED/" in
+    "$h/OneDrive/"*|"$h/OneDrive - "*/*)
+      echo "warning: this folder is inside OneDrive, which can fight with saved work. A folder like ~/Projects/<name> is safer."
+      break ;;
+  esac
+done
 
 mkdir -p "$FOLDER/docs" || { echo "could not create $FOLDER" >&2; exit 1; }
 
@@ -135,6 +195,9 @@ else
       && git -C "$FOLDER" symbolic-ref HEAD refs/heads/main >/dev/null 2>&1
   fi
   if git -C "$FOLDER" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    # Keep line endings as they are: on a PC, Git's default would print an "LF will be replaced
+    # by CRLF" warning for every file at the first save, and could turn scripts into CRLF ones.
+    git -C "$FOLDER" config core.autocrlf false
     echo "git: initialized"
   else
     echo "git: could not initialize (skipped)"

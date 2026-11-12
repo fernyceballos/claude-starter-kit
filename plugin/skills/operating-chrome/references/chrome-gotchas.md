@@ -9,9 +9,11 @@
 3. Prefer reading pages as text or the accessibility tree over screenshots. Use screenshots to
    confirm what a person would see.
 
-## Make a hidden tab visible (macOS)
+## Make a hidden tab visible (Mac only)
 
-Find where the tab is, then make it active. Several windows may hold look-alike tabs, so list first.
+On a Windows PC there's no equivalent command: ask the person to click the tab, then carry on.
+
+On a Mac, find where the tab is, then make it active. Several windows may hold look-alike tabs, so list first.
 
 ```bash
 # list matching tabs with window id and position

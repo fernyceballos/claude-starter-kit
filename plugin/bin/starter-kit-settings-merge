@@ -28,6 +28,8 @@ if [ -L "$TARGET" ]; then
 fi
 
 command -v jq >/dev/null 2>&1 || { echo "jq is required but was not found" >&2; exit 1; }
+# -b: Windows' jq (jq.exe in Git Bash) ends lines with CRLF without it. Old jq (1.6) has no -b.
+if command jq -b -n 1 >/dev/null 2>&1; then jq() { command jq -b "$@"; }; fi
 
 # The kit's defaults must be a JSON object.
 [ -f "$DEFAULTS" ] && jq -e 'type == "object"' "$DEFAULTS" >/dev/null 2>&1 \
@@ -105,8 +107,8 @@ if [ "$EXISTED" -eq 1 ]; then
   n=2
   while [ -e "$BAK" ]; do BAK="$TARGET.bak-$(date +%F)-$n"; n=$((n + 1)); done
   cp -p "$TARGET" "$BAK" || exit 1
-  MODE="$(stat -f %Lp "$TARGET" 2>/dev/null || stat -c %a "$TARGET" 2>/dev/null || true)"
-  [ -n "$MODE" ] && chmod "$MODE" "$TMP"
+  MODE="$(stat -c %a "$TARGET" 2>/dev/null || stat -f %Lp "$TARGET" 2>/dev/null || true)"   # GNU form first: in Git Bash, -f means "filesystem"
+  case "$MODE" in ''|*[!0-9]*) ;; *) chmod "$MODE" "$TMP" ;; esac
 fi
 mv "$TMP" "$TARGET" || { echo "could not write $TARGET; nothing was changed" >&2; exit 1; }
 trap - EXIT

@@ -7,7 +7,7 @@ description: Use when the person says "coach me", "continue the coach", "teach m
 
 The lessons are in the kit folder: run `starter-kit-root` and look in `coach/lessons/`. (If
 `starter-kit-root` isn't found, the kit folder is
-`{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions -path '*/rpm/plugin_*/.claude-plugin/plugin.json' -exec grep -l '"name": *"starter-kit"' {} + | sed 's|/.claude-plugin/plugin.json$||'; } 2>/dev/null | while read -r d; do [ -f "$d/.claude-plugin/plugin.json" ] && printf '%s\t%s\n' "$(jq -r .version "$d/.claude-plugin/plugin.json")" "$d"; done | sort -t. -k1,1n -k2,2n -k3,3n | tail -1 | cut -f2`, and the state helper is its
+`{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json | tr -d '\r' | sed 's|$|/.claude-plugin/plugin.json|'; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions ~/Library/Application\ Support/Claude/rpm ~/AppData/Roaming/Claude/local-agent-mode-sessions ~/AppData/Roaming/Claude/rpm ~/AppData/Local/Claude-Data -path '*/rpm/*plugin_*/.claude-plugin/plugin.json'; find ~/AppData/Local/Packages -mindepth 1 -maxdepth 1 -type d | while read -r p; do find "$p/LocalCache/Roaming/Claude/local-agent-mode-sessions" "$p/LocalCache/Roaming/Claude/rpm" "$p/LocalCache/Local/Claude-Data" -path '*/rpm/*plugin_*/.claude-plugin/plugin.json'; done; } 2>/dev/null | while read -r f; do [ "$(jq -r .name "$f" 2>/dev/null | tr -d '\r')" = starter-kit ] && printf '%s\t%s\n' "$(jq -r .version "$f" | tr -d '\r')" "${f%/.claude-plugin/plugin.json}"; done | sort -t. -k1,1n -k2,2n -k3,3n | tail -1 | cut -f2`, and the state helper is its
 `bin/starter-kit-state`.) The lessons are (files
 `01-…md` to `08-…md`). Each has a `kits:` list at the top, then **What**, **Why**, either
 **Try it now** (safe to do right here in the coach chat) or **Next time** (for a real job later),
@@ -25,6 +25,21 @@ when the person says yes or "coach me".
 
 ## Walkthrough mode ("coach me", "continue the coach", or a yes to the offer)
 
+0. **Are the automatic phrases working?** Run `starter-kit-state get hooks-seen`. A date means the
+   kit's automatic triggers have run on this computer: say nothing about it. If nothing prints, also
+   run `starter-kit-state get last-seen-version`: when it shows a version and that isn't this kit's
+   version (`$ROOT/.claude-plugin/plugin.json`), the kit was just updated: say nothing, because the
+   older kit didn't keep this record and the next chat will. Otherwise nothing printed means the
+   triggers don't run yet, so phrases like **wind down** won't do anything special. Tell the person in
+   one or two plain lines: "Heads up: the automatic phrases aren't working yet on this computer.
+   Here's the fix." Then:
+   - **Windows PC:** check that `git --version` works. If it doesn't, Git for Windows is missing:
+     install it with `winget install --id Git.Git -e --accept-source-agreements
+     --accept-package-agreements` (say first that this accepts winget's terms for them). Then quit
+     Claude fully: right-click the Claude icon by the clock → **Quit**, and open Claude again.
+   - **Mac:** quit Claude fully (Claude menu → **Quit Claude**) and open it again.
+   If it's still empty in the next chat, they should contact their coach (the contact in
+   `~/.claude/CLAUDE.md`). Then carry on with the lessons; never hold the coaching up for this.
 1. Run `starter-kit-state coach list` to see the lesson numbers already done.
 2. First time: one line on what this is ("8 short lessons, about 10 minutes, one at a time. Say
    *stop* any time and *continue the coach* later").

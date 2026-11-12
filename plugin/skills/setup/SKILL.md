@@ -13,8 +13,8 @@ technical question. Report each step as **done**, **kept** (already theirs, left
 ## Find the kit's folder first
 
 Run `starter-kit-root`. If that command isn't found (it isn't on the path yet in the same chat as
-the install), use `{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions -path '*/rpm/plugin_*/.claude-plugin/plugin.json' -exec grep -l '"name": *"starter-kit"' {} + | sed 's|/.claude-plugin/plugin.json$||'; } 2>/dev/null | while read -r d; do [ -f "$d/.claude-plugin/plugin.json" ] && printf '%s\t%s\n' "$(jq -r .version "$d/.claude-plugin/plugin.json")" "$d"; done | sort -t. -k1,1n -k2,2n -k3,3n | tail -1 | cut -f2` (it checks both places the kit can be installed: the `claude` command's record,
-then the desktop app's own plugin folder). Call it `ROOT` below, and call its scripts as
+the install), use `{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json | tr -d '\r' | sed 's|$|/.claude-plugin/plugin.json|'; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions ~/Library/Application\ Support/Claude/rpm ~/AppData/Roaming/Claude/local-agent-mode-sessions ~/AppData/Roaming/Claude/rpm ~/AppData/Local/Claude-Data -path '*/rpm/*plugin_*/.claude-plugin/plugin.json'; find ~/AppData/Local/Packages -mindepth 1 -maxdepth 1 -type d | while read -r p; do find "$p/LocalCache/Roaming/Claude/local-agent-mode-sessions" "$p/LocalCache/Roaming/Claude/rpm" "$p/LocalCache/Local/Claude-Data" -path '*/rpm/*plugin_*/.claude-plugin/plugin.json'; done; } 2>/dev/null | while read -r f; do [ "$(jq -r .name "$f" 2>/dev/null | tr -d '\r')" = starter-kit ] && printf '%s\t%s\n' "$(jq -r .version "$f" | tr -d '\r')" "${f%/.claude-plugin/plugin.json}"; done | sort -t. -k1,1n -k2,2n -k3,3n | tail -1 | cut -f2` (it checks every place the kit can be installed: the `claude` command's record, then the
+desktop app's own plugin folders on a Mac or a Windows PC). Call it `ROOT` below, and call its scripts as
 `"$ROOT/bin/<name>"`.
 
 ## Pick the mode
@@ -26,6 +26,16 @@ then the desktop app's own plugin folder). Call it `ROOT` below, and call its sc
 | "start a project" / "set up this folder" | **Start a project** |
 | "upgrade this project", "make this a builder project", "add research to this folder" | **Upgrade** |
 | "update the kit" | **Update** |
+
+## Are the automatic phrases working? (every mode except First run and Update)
+
+In the first-run chat the kit was only just installed, so its triggers haven't had a chance to run;
+in an update chat the record may come from an older kit that didn't keep it. Skip this in both. In
+every other mode, run `"$ROOT/bin/starter-kit-state" get hooks-seen`. Nothing
+printed means the automatic phrases aren't working yet on this computer: say so in one line, and
+give the same fix as the coach's step 0 (`$ROOT/skills/coach/SKILL.md`): on a Windows PC, Git for
+Windows installed, then right-click the Claude icon by the clock → **Quit** and reopen; on a Mac,
+quit Claude fully and reopen. Then carry on with the mode.
 
 ## The project folder (`PROJECT` below)
 
@@ -44,8 +54,13 @@ Make one todo per step.
 ### 1. Computer check
 
 Check each item and report OK / installed / needs you:
-- `git --version` (missing → the person runs `xcode-select --install` and clicks Install; wait).
-- `jq --version` (missing → `brew install jq`).
+- `git --version` and `jq --version`. Missing on a **Mac**: git → the person runs
+  `xcode-select --install` and clicks Install (wait); jq → `brew install jq`. Missing on a
+  **Windows PC** (after one line saying this accepts winget's terms for them):
+  `winget install --id Git.Git -e --accept-source-agreements --accept-package-agreements`,
+  `winget install --id jqlang.jq -e --accept-source-agreements --accept-package-agreements`.
+  New tools need Claude restarted (on a PC: right-click the Claude icon by the clock → **Quit**,
+  reopen, and say **set me up** again).
 - `gh auth status` shows signed in.
 - Claude in Chrome connected: try loading its tools. Not connected → explain how to install the
   extension and sign in, and carry on; it's only needed for operator and research work.
@@ -83,7 +98,7 @@ nothing is deleted. Say that.
    - **researcher**: "study a person, profile, videos or a market and tell me what works".
    - **builder**: "build an app, portal or website with code".
    - **all three** ("all of the above"): a bit of everything. Always offer it alongside the three.
-     Apply operator, researcher and builder, in that order. Each adds its own section and files
+     Apply operator, researcher and builder, in that order, in one call. Each adds its own section and files
      without touching the others, so they sit together in one folder fine. Question 3 and the
      researcher tools below then apply too.
    - Not sure → recommend **operator**; it's the gentlest start and can be upgraded later.
@@ -94,8 +109,10 @@ nothing is deleted. Say that.
 5. **"Which Claude plan are you on: Max, Pro, or not sure?"** (claude.ai → Settings → Billing
    shows it.) Max → the `max` settings; Pro → `pro`; not sure → `unsure`.
 
-**If researcher was picked:** now check `yt-dlp` and `ffmpeg`, and install them
-(`brew install yt-dlp ffmpeg`) after a yes.
+**If researcher was picked:** now check `yt-dlp` and `ffmpeg`, and install them after a yes: on a
+Mac `brew install yt-dlp ffmpeg`; on a Windows PC
+`winget install --id yt-dlp.yt-dlp -e --accept-source-agreements --accept-package-agreements` and
+`winget install --id Gyan.FFmpeg -e --accept-source-agreements --accept-package-agreements`.
 
 ### 4. The preferences file
 
@@ -146,8 +163,12 @@ Either way, mention that saying **"update the kit"** updates by hand any time.
 
 ### 9. Set up the project folder
 
-Settle `PROJECT` (see above). For each chosen kit: `"$ROOT/bin/starter-kit-apply" <kit> "$PROJECT"`.
-Keep its output: the `filled docs/<path>` lines name the files it created. Then fill
+Settle `PROJECT` (see above). Apply every chosen kit in ONE call, in the order operator,
+researcher, builder: `"$ROOT/bin/starter-kit-apply" <kit> [<kit>…] "$PROJECT"` (one call keeps a
+single backup of each file they had, instead of backups of files this run just made).
+Keep its output: the `filled docs/<path>` lines name the files it created. If it prints a
+`warning: this folder is inside OneDrive…` line, tell the person in plain words and offer to use
+a folder like `~/Projects/<name>` instead (their call). Then fill
 `"$PROJECT/docs/MAP.md"` from question 3, if asked.
 
 ### 10. Save it
@@ -176,6 +197,7 @@ New skills only load in a new chat, so this chat can't run the coach. Say:
 - "In the new chat, say **coach me** for the 10-minute walkthrough of how to work with Claude. I'd
   start there. The coach also gives you your field guide: every phrase on one page, to keep."
   (The new chat will also offer the coach once on its own.)
+- "No need to wind down this chat: setup already saved everything."
 
 ---
 
@@ -200,7 +222,7 @@ real job."
 1. Note the current version from `$ROOT/.claude-plugin/plugin.json`.
 2. `claude plugin marketplace update starter-kit-marketplace`
 3. `claude plugin update starter-kit@starter-kit-marketplace`
-4. Find the new version by running `{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions -path '*/rpm/plugin_*/.claude-plugin/plugin.json' -exec grep -l '"name": *"starter-kit"' {} + | sed 's|/.claude-plugin/plugin.json$||'; } 2>/dev/null | while read -r d; do [ -f "$d/.claude-plugin/plugin.json" ] && printf '%s\t%s\n' "$(jq -r .version "$d/.claude-plugin/plugin.json")" "$d"; done | sort -t. -k1,1n -k2,2n -k3,3n | tail -1 | cut -f2` again (an update installs into a new folder),
+4. Find the new version by running `{ jq -r '.plugins["starter-kit@starter-kit-marketplace"][0].installPath // empty' ~/.claude/plugins/installed_plugins.json | tr -d '\r' | sed 's|$|/.claude-plugin/plugin.json|'; find ~/Library/Application\ Support/Claude/local-agent-mode-sessions ~/Library/Application\ Support/Claude/rpm ~/AppData/Roaming/Claude/local-agent-mode-sessions ~/AppData/Roaming/Claude/rpm ~/AppData/Local/Claude-Data -path '*/rpm/*plugin_*/.claude-plugin/plugin.json'; find ~/AppData/Local/Packages -mindepth 1 -maxdepth 1 -type d | while read -r p; do find "$p/LocalCache/Roaming/Claude/local-agent-mode-sessions" "$p/LocalCache/Roaming/Claude/rpm" "$p/LocalCache/Local/Claude-Data" -path '*/rpm/*plugin_*/.claude-plugin/plugin.json'; done; } 2>/dev/null | while read -r f; do [ "$(jq -r .name "$f" 2>/dev/null | tr -d '\r')" = starter-kit ] && printf '%s\t%s\n' "$(jq -r .version "$f" | tr -d '\r')" "${f%/.claude-plugin/plugin.json}"; done | sort -t. -k1,1n -k2,2n -k3,3n | tail -1 | cut -f2` again (an update installs into a new folder),
    read its `.claude-plugin/plugin.json`, and report old → new. Then refresh the pieces that live
    outside the plugin, using the NEW folder: copy its `bin/starter-kit-statusline` over
    `~/.claude/starter-kit/statusline.sh`, and run its `skills/design-systems/refresh.sh` (quick if

@@ -4,11 +4,15 @@
 #   KIT-OFFER-COACH  first run: offer the coaching walkthrough, once
 #   KIT-TIP-FOLDER   this folder isn't set up yet: mention "start a project", once per folder
 #   KIT-WHATS-NEW    the kit was updated: summarise the top changelog entry, once per version
+# It also records today's date as hooks-seen, proof that the kit's triggers really run here
+# (on a Windows PC they need Git Bash). The coach checks it.
 #
 # Non-blocking: always exits 0, prints nothing when nothing applies.
 set -u
 
 command -v jq >/dev/null 2>&1 || exit 0
+# -b: Windows' jq (jq.exe in Git Bash) ends lines with CRLF without it. Old jq (1.6) has no -b.
+if command jq -b -n 1 >/dev/null 2>&1; then jq() { command jq -b "$@"; }; fi
 
 root="${CLAUDE_PLUGIN_ROOT:-}"
 [ -n "$root" ] || exit 0
@@ -18,6 +22,10 @@ state="$root/bin/starter-kit-state"
 input="$(cat)"
 source_kind="$(printf '%s' "$input" | jq -r '.source // empty' 2>/dev/null)" || exit 0
 cwd="$(printf '%s' "$input" | jq -r '.cwd // empty' 2>/dev/null)" || exit 0
+
+case "$source_kind" in
+  startup|compact) "$state" set hooks-seen "$(date +%F)" >/dev/null 2>&1 || true ;;
+esac
 
 nl='
 '

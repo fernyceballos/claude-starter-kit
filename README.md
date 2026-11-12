@@ -15,6 +15,8 @@ your yes.
 
 ## Getting started
 
+Works on a Mac or a Windows PC. On a Windows PC, use the Claude desktop app.
+
 1. Ferny invites your GitHub username to this private repo. Accept the invite (check your email).
 2. Make a folder for your first project and open it in Claude Code.
 3. Paste the prompt in [BOOTSTRAP.md](BOOTSTRAP.md).

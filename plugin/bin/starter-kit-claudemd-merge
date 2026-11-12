@@ -50,8 +50,8 @@ install_result() { # <tmpfile>
     n=2
     while [ -e "$bak" ]; do bak="$TARGET.bak-$(date +%F)-$n"; n=$((n + 1)); done
     cp -p "$TARGET" "$bak" || exit 1
-    mode="$(stat -f %Lp "$TARGET" 2>/dev/null || stat -c %a "$TARGET" 2>/dev/null || true)"
-    [ -n "$mode" ] && chmod "$mode" "$tmp"
+    mode="$(stat -c %a "$TARGET" 2>/dev/null || stat -f %Lp "$TARGET" 2>/dev/null || true)"   # GNU form first: in Git Bash, -f means "filesystem"
+    case "$mode" in ''|*[!0-9]*) ;; *) chmod "$mode" "$tmp" ;; esac
   fi
   mv "$tmp" "$TARGET" || exit 1
 }

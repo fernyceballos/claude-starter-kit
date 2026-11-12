@@ -6,7 +6,7 @@ description: Use when using the Claude in Chrome tools in the person's own brows
 # Operating Chrome (the person's own browser)
 
 **REQUIRED BACKGROUND:** `anthropic-skills:chrome-browser` (loading the tools, permissions).
-Full detail and the macOS commands: `references/chrome-gotchas.md` next to this file. This skill
+Full detail and the Mac-only commands: `references/chrome-gotchas.md` next to this file. This skill
 is the checklist.
 
 ## Every browser task

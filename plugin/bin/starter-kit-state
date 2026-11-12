@@ -13,7 +13,8 @@
 #   starter-kit-state has-line <key> <line>   exit 0 if the exact line is in the list file
 #
 # Keys used: coach-done, coach-offered, last-seen-version, research-warned,
-# coach-progress (via "coach"), folders-tipped (a list of folder paths).
+# coach-progress (via "coach"), folders-tipped (a list of folder paths), hooks-seen (the date the
+# start-of-chat trigger last ran).
 set -u
 
 DIR="${HOME:-}/.claude/starter-kit/state"
