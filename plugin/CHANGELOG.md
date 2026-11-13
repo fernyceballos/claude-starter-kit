@@ -1,5 +1,11 @@
 # What's new in the starter kit
 
+## 0.2.1 — 2026-11-12
+
+- **Clearer steps for adding plugins.** When you add Superpowers or the starter kit in the Claude
+  app, Claude now gives you numbered steps, one click per line, telling you exactly what to click
+  and where it is on the screen.
+
 ## 0.2.0 — 2026-11-12
 
 - **Works on Windows PCs now.** The same setup prompt asks whether you're on a Mac or a PC. On a PC

@@ -91,9 +91,11 @@ Enter) instead.
      tell me to check my email for the GitHub invite, or to ask my coach to invite my username.
 
 Note for steps 4 and 5: if `claude --version` doesn't work (the desktop app doesn't always add
-the `claude` command), use the desktop app's Plugins screen instead and walk me through the
-clicks. Open it with + (next to the message box) → Add plugins (once something is installed, it's
-+ → Plugins → Browse plugins). Where the desktop app puts a plugin depends on where it came
+the `claude` command), use the desktop app's Plugins screen instead. I don't know where anything
+is in the app, so never just say "add it from the plugins menu": give me numbered steps, one click
+per line, naming exactly what to click and where it is on the screen, and wait for me. Open it
+with: click the + button at the left edge of the box where I type messages → click "Add plugins"
+(if that isn't there, click "Plugins" → "Browse plugins"). Where the desktop app puts a plugin depends on where it came
 from: Anthropic's own plugin list (Superpowers) goes into the app's own folder, not
 ~/.claude/plugins; a marketplace you add (the starter kit) goes into ~/.claude/plugins like the
 `claude` command does. So use the check commands below, which look in every place.
@@ -102,9 +104,12 @@ from: Anthropic's own plugin list (Superpowers) goes into the app's own folder, 
    - With `claude`:
      `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1 claude plugin marketplace add obra/superpowers-marketplace`
      `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1 claude plugin install superpowers@superpowers-marketplace --scope user`
-   - In the desktop app: search the Plugins screen for `superpowers`, pick **Superpowers** (the
-     one with the checkmark, from obra/superpowers) and click **Add**. It's in Anthropic's own
-     plugin list, so no marketplace is needed. Ignore the look-alikes marked "Community".
+   - In the desktop app, give me these steps, numbered, one per line: 1) click the + button at the
+     left edge of the message box; 2) click "Add plugins" (or "Plugins" → "Browse plugins");
+     3) click the search box at the top of the Plugins screen and type `superpowers`; 4) pick
+     **Superpowers**, the one with the checkmark that says obra/superpowers (skip any marked
+     "Community"); 5) click **Add**; 6) close the Plugins screen and come back to this chat. It's in
+     Anthropic's own plugin list, so no marketplace is needed.
    - Check it (works for both): `{ jq -r '.plugins | keys[] | select(startswith("superpowers@"))' ~/.claude/plugins/installed_plugins.json; { find ~/Library/Application\ Support/Claude/local-agent-mode-sessions ~/Library/Application\ Support/Claude/rpm ~/AppData/Roaming/Claude/local-agent-mode-sessions ~/AppData/Roaming/Claude/rpm ~/AppData/Local/Claude-Data -path '*/rpm/*plugin_*/.claude-plugin/plugin.json'; find ~/AppData/Local/Packages -mindepth 1 -maxdepth 1 -type d | while read -r p; do find "$p/LocalCache/Roaming/Claude/local-agent-mode-sessions" "$p/LocalCache/Roaming/Claude/rpm" "$p/LocalCache/Local/Claude-Data" -path '*/rpm/*plugin_*/.claude-plugin/plugin.json'; done; } | while read -r f; do grep -q '"name": *"superpowers"' "$f" && echo "${f%/.claude-plugin/plugin.json}"; done; } 2>/dev/null`
      It prints a line if Superpowers is installed. If it prints nothing, ask me to look on the
      Plugins screen under Yours: Superpowers should be listed there with its switch on.
@@ -113,11 +118,13 @@ from: Anthropic's own plugin list (Superpowers) goes into the app's own folder, 
    - With `claude`:
      `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1 claude plugin marketplace add fernyceballos/claude-starter-kit`
      `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1 claude plugin install starter-kit@starter-kit-marketplace --scope user`
-   - In the desktop app: on the Plugins screen click **+ Add** (top right) → **Add marketplace**,
-     paste `fernyceballos/claude-starter-kit`, confirm. **Starter kit** then shows on the Discover
-     tab: click the arrow next to its **Add** button and choose **Install for me** (installs to
-     ~/.claude/, for all projects). Not either "Install for project" option: those put it in just
-     this one folder.
+   - In the desktop app, give me these steps, numbered, one per line: 1) open the Plugins screen
+     the same way (+ at the left edge of the message box → "Plugins" → "Browse plugins");
+     2) click **+ Add** at the top right of the Plugins screen; 3) click **Add marketplace**;
+     4) paste `fernyceballos/claude-starter-kit` into the box and confirm; 5) on the Discover tab,
+     find **Starter kit** and click the small arrow next to its **Add** button; 6) choose
+     **Install for me** (it installs for all projects). Not either "Install for project" option:
+     those put it in just this one folder. 7) close the Plugins screen and come back to this chat.
    If either one fails with a sign-in or "not found" error, run `gh auth setup-git` again and
    retry once.
 
