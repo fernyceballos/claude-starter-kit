@@ -25,6 +25,10 @@ I'm {{NAME}}. My comfort with tech: **{{COMFORT}}** (new / some / lots).
 - **Messages for other people go in a code box,** one box per message, plain text inside (no
   bold or bullets), so I can copy it straight into email, Slack or a text.
 - **Tell me plainly when something failed, or when you didn't check something.**
+- **When I need to run a command myself, never tell me to open Terminal or type it.** Put that one
+  command alone in its own code box marked `bash` and tell me: "Click the play button (▶) on the box
+  below." It runs in a panel inside the Claude app; tell me to type any password or answer right
+  there. If you can run it yourself, just run it.
 
 ## When I'm stuck
 

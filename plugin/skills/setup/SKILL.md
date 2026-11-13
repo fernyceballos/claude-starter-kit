@@ -51,6 +51,10 @@ in quotes, to every script and git command (`git -C "$PROJECT" …`), so this wo
 
 Make one todo per step.
 
+Whenever the person has to run a command themselves, never tell them to open Terminal or type it:
+put that one command alone in its own code box marked `bash` and tell them "Click the play button
+(▶) on the box below", then to answer any prompt in the panel that opens.
+
 ### 1. Computer check
 
 Check each item and report OK / installed / needs you:
@@ -226,7 +230,12 @@ real job."
    read its `.claude-plugin/plugin.json`, and report old → new. Then refresh the pieces that live
    outside the plugin, using the NEW folder: copy its `bin/starter-kit-statusline` over
    `~/.claude/starter-kit/statusline.sh`, and run its `skills/design-systems/refresh.sh` (quick if
-   nothing changed). Tell them to start a new
+   nothing changed). Refresh the preferences note too: read their name and comfort level from the
+   `I'm … My comfort with tech: **…**` line of the starter-kit section in `~/.claude/CLAUDE.md`,
+   fill the NEW folder's `templates/global-CLAUDE.section.md` with them in a temp file, and run
+   `"<new folder>/bin/starter-kit-claudemd-merge" ~/.claude/CLAUDE.md <temp file> global --update`
+   (only the kit's own section changes; their text outside it is never touched). Report `updated`
+   or `kept`. Tell them to start a new
    chat to use it. Their folders and settings aren't changed by an update; "upgrade this project"
    picks up new kit pieces if they want them.
 5. If `claude` isn't found (the desktop app doesn't always add the command), walk them through

@@ -13,13 +13,14 @@ Do these steps in order. After each one, check it worked before moving on. If a 
 and tell me in plain words what happened and what to do, and if I'm stuck, tell me to contact my
 coach at ferny@attractionmarketing.com.
 
-When a step says I run a command myself, show me that one command alone in its own code box marked
-`bash`. In the Claude desktop app, that box gets a Run button: tell me to click it. The command then
-runs in a Terminal panel inside the app, so tell me to watch that panel, and to type right there
-anything it asks for (a password, a yes, pressing Enter). Nothing shows on screen while I type a
-password; that's normal. I tell you when it's finished. Only if there's no Run button do I paste the
-command into the Terminal app (Mac) or PowerShell (Windows PC: click Start, type PowerShell, press
-Enter) instead.
+When a step says I run a command myself, never tell me to open Terminal or type the command. Show
+me that one command alone in its own code box marked `bash`, and say: "Click the play button (▶) on
+the box below." In the Claude desktop app that box has a play button. The command then runs in a
+Terminal panel inside the app, so tell me to watch that panel, and to type right there anything it
+asks for (a password, a yes, pressing Enter). Nothing shows on screen while I type a password;
+that's normal. I tell you when it's finished. Only if I tell you there's no play button do I paste
+the command into the Terminal app (Mac) or PowerShell (Windows PC: click Start, type PowerShell,
+press Enter) instead.
 
 1. Tell me in two lines what's about to happen: you'll check my computer, install a few free
    tools, connect to my coach's private kit on GitHub, then ask me a few easy questions to set up

@@ -1,5 +1,12 @@
 # What's new in the starter kit
 
+## 0.2.2 — 2026-11-12
+
+- **No more "open Terminal".** Whenever you need to run a command yourself, Claude puts it in a box
+  with a play button (▶) and tells you to click it. This now holds in every chat, not just setup.
+- Saying **"update the kit"** now also refreshes your "how to talk with me" note, so new rules
+  like this one reach you.
+
 ## 0.2.1 — 2026-11-12
 
 - **Clearer steps for adding plugins.** When you add Superpowers or the starter kit in the Claude
